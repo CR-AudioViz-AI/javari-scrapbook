@@ -1,21 +1,21 @@
 // lib/supabase/client.ts
 // Supabase client configuration
 
-import { createBrowserClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 
+// Browser client for client components
 export function createBrowserSupabaseClient() {
-  return createBrowserClient(
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 }
 
-// For server components
+// Server client with service role (for API routes)
 export function createServerSupabaseClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       auth: {
         autoRefreshToken: false,
@@ -23,6 +23,20 @@ export function createServerSupabaseClient() {
       }
     }
   );
+}
+
+// Singleton for browser
+let browserClient: ReturnType<typeof createClient> | null = null;
+
+export function getSupabaseClient() {
+  if (typeof window === 'undefined') {
+    return createServerSupabaseClient();
+  }
+  
+  if (!browserClient) {
+    browserClient = createBrowserSupabaseClient();
+  }
+  return browserClient;
 }
 
 // Database types
