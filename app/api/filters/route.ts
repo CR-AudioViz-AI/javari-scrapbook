@@ -65,7 +65,7 @@ const FILTERS: Filter[] = [
   { id: 'green-tint', name: 'Green Tint', category: 'color', css: 'hue-rotate(90deg) saturate(80%)', description: 'Earthy green tones' },
 ];
 
-const CATEGORIES = [...new Set(FILTERS.map(f => f.category))];
+const CATEGORIES = Array.from(new Set(FILTERS.map(f => f.category)));
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
