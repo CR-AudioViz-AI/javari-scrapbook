@@ -64,7 +64,7 @@ const SHAPES: Shape[] = [
   { id: 'frame-polaroid', name: 'Polaroid Frame', category: 'frames', svg: (c, s, w) => `<svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="90" height="110" fill="${c}" stroke="${s}" stroke-width="${w}"/><rect x="10" y="10" width="80" height="80" fill="#f0f0f0"/></svg>` },
 ];
 
-const CATEGORIES = [...new Set(SHAPES.map(s => s.category))];
+const CATEGORIES = Array.from(new Set(SHAPES.map(s => s.category)));
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
