@@ -213,7 +213,7 @@ const FRAMES: Frame[] = [
   },
 ];
 
-const CATEGORIES = [...new Set(FRAMES.map(f => f.category))];
+const CATEGORIES = Array.from(new Set(FRAMES.map(f => f.category)));
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
