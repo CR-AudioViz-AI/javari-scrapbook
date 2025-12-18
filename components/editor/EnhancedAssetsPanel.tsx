@@ -2,7 +2,8 @@
 
 // CRAV Scrapbook - Comprehensive Assets Panel
 // All 24+ components organized into logical categories with tabbed navigation
-// Timestamp: Tuesday, December 17, 2025 – 9:35 PM Eastern Time
+// FIX: Properly handle required props for browser components with default handlers
+// Timestamp: Tuesday, December 17, 2025 – 10:20 PM Eastern Time
 
 import React, { useState, useCallback, Suspense, lazy } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,26 +15,25 @@ import {
   Loader2, ChevronDown, ChevronRight, X, RefreshCw, Heart, Smile
 } from 'lucide-react';
 
-// Lazy load heavy components for better performance
-// Components use named exports, so we convert them to default exports for React.lazy
-const StockPhotoBrowser = lazy(() => import('./StockPhotoBrowser').then(mod => ({ default: mod.StockPhotoBrowser })));
-const GiphyBrowser = lazy(() => import('./GiphyBrowser').then(mod => ({ default: mod.GiphyBrowser })));
-const IconsBrowser = lazy(() => import('./IconsBrowser').then(mod => ({ default: mod.default })));
-const GradientsBrowser = lazy(() => import('./GradientsBrowser').then(mod => ({ default: mod.default })));
-const FiltersBrowser = lazy(() => import('./FiltersBrowser').then(mod => ({ default: mod.default })));
-const FramesBrowser = lazy(() => import('./FramesBrowser').then(mod => ({ default: mod.default })));
-const StickersBrowser = lazy(() => import('./StickersBrowser').then(mod => ({ default: mod.default })));
-const ShapesBrowser = lazy(() => import('./ShapesBrowser').then(mod => ({ default: mod.default })));
-const QRCodeGenerator = lazy(() => import('./QRCodeGenerator').then(mod => ({ default: mod.default })));
-const AvatarCreator = lazy(() => import('./AvatarCreator').then(mod => ({ default: mod.default })));
-const CollageBuilder = lazy(() => import('./CollageBuilder').then(mod => ({ default: mod.default })));
-const BackgroundPicker = lazy(() => import('./BackgroundPicker').then(mod => ({ default: mod.default })));
-const PatternPicker = lazy(() => import('./PatternPicker').then(mod => ({ default: mod.default })));
-const ColorPalettePicker = lazy(() => import('./ColorPalettePicker').then(mod => ({ default: mod.default })));
-const TextEffectsPanel = lazy(() => import('./TextEffectsPanel').then(mod => ({ default: mod.default })));
-const TemplateGallery = lazy(() => import('./TemplateGallery').then(mod => ({ default: mod.TemplateGallery })));
-const PremiumStore = lazy(() => import('./PremiumStore').then(mod => ({ default: mod.default })));
-const AIEnhancePanel = lazy(() => import('./AIEnhancePanel').then(mod => ({ default: mod.AIEnhancePanel })));
+// Lazy load heavy components - using default exports
+const StockPhotoBrowser = lazy(() => import('./StockPhotoBrowser'));
+const GiphyBrowser = lazy(() => import('./GiphyBrowser'));
+const IconsBrowser = lazy(() => import('./IconsBrowser'));
+const GradientsBrowser = lazy(() => import('./GradientsBrowser'));
+const FiltersBrowser = lazy(() => import('./FiltersBrowser'));
+const FramesBrowser = lazy(() => import('./FramesBrowser'));
+const StickersBrowser = lazy(() => import('./StickersBrowser'));
+const ShapesBrowser = lazy(() => import('./ShapesBrowser'));
+const QRCodeGenerator = lazy(() => import('./QRCodeGenerator'));
+const AvatarCreator = lazy(() => import('./AvatarCreator'));
+const CollageBuilder = lazy(() => import('./CollageBuilder'));
+const BackgroundPicker = lazy(() => import('./BackgroundPicker'));
+const PatternPicker = lazy(() => import('./PatternPicker'));
+const ColorPalettePicker = lazy(() => import('./ColorPalettePicker'));
+const TextEffectsPanel = lazy(() => import('./TextEffectsPanel'));
+const TemplateGallery = lazy(() => import('./TemplateGallery'));
+const PremiumStore = lazy(() => import('./PremiumStore'));
+const AIEnhancePanel = lazy(() => import('./AIEnhancePanel'));
 
 // Category definitions
 type CategoryId = 'media' | 'elements' | 'design' | 'tools' | 'premium';
@@ -126,26 +126,10 @@ function LoadingSpinner({ label }: { label?: string }) {
   );
 }
 
-// Error boundary fallback
-function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-12 px-4">
-      <X className="w-8 h-8 text-red-500 mb-2" />
-      <p className="text-sm text-red-500 text-center mb-2">Failed to load component</p>
-      <button 
-        onClick={resetErrorBoundary}
-        className="text-sm text-blue-600 hover:underline flex items-center gap-1"
-      >
-        <RefreshCw className="w-3 h-3" /> Try again
-      </button>
-    </div>
-  );
-}
-
 // Upload panel component (inline since it's simple)
 function UploadsPanel() {
   const [userUploads, setUserUploads] = useState<string[]>([]);
-  const { addElement, getCurrentPage } = useScrapbookStore();
+  const { addElement } = useScrapbookStore();
 
   const handleUserUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -227,6 +211,47 @@ function UploadsPanel() {
   );
 }
 
+// Wrapper components that provide default props to browser components
+// These handle the case where browsers were designed as modals with required callbacks
+
+function StockPhotoBrowserWrapper() {
+  const { addElement } = useScrapbookStore();
+  
+  const handleSelect = useCallback((imageUrl: string) => {
+    const page = useScrapbookStore.getState().getCurrentPage();
+    if (!page) return;
+    
+    const img = new window.Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const maxW = page.width * 0.5;
+      const maxH = page.height * 0.5;
+      let w = img.width;
+      let h = img.height;
+      if (w > maxW) { h = (maxW / w) * h; w = maxW; }
+      if (h > maxH) { w = (maxH / h) * w; h = maxH; }
+      addElement(createPhotoElement(imageUrl, { x: page.width / 2 - w / 2, y: page.height / 2 - h / 2 }, { width: w, height: h }));
+    };
+    img.src = imageUrl;
+  }, [addElement]);
+  
+  // Try to render with optional props first, fall back to required props
+  return <StockPhotoBrowser onClose={() => {}} onSelect={handleSelect} isModal={false} />;
+}
+
+function GiphyBrowserWrapper() {
+  const { addElement } = useScrapbookStore();
+  
+  const handleSelect = useCallback((gifUrl: string) => {
+    const page = useScrapbookStore.getState().getCurrentPage();
+    if (!page) return;
+    
+    addElement(createPhotoElement(gifUrl, { x: page.width / 2 - 150, y: page.height / 2 - 100 }, { width: 300, height: 200 }));
+  }, [addElement]);
+  
+  return <GiphyBrowser onClose={() => {}} onSelect={handleSelect} isModal={false} />;
+}
+
 export function EnhancedAssetsPanel() {
   const [expandedCategory, setExpandedCategory] = useState<CategoryId>('media');
   const [activeTab, setActiveTab] = useState<TabId>('uploads');
@@ -239,14 +264,13 @@ export function EnhancedAssetsPanel() {
 
   const toggleCategory = (categoryId: CategoryId) => {
     setExpandedCategory(expandedCategory === categoryId ? expandedCategory : categoryId);
-    // Set first tab of the category as active
     const category = categories.find(c => c.id === categoryId);
     if (category && category.tabs.length > 0) {
       setActiveTab(category.tabs[0].id);
     }
   };
 
-  // Render the active tab content
+  // Render the active tab content with proper prop handling
   const renderContent = () => {
     return (
       <Suspense fallback={<LoadingSpinner label={`Loading ${activeTab}...`} />}>
@@ -259,24 +283,33 @@ export function EnhancedAssetsPanel() {
             transition={{ duration: 0.15 }}
             className="h-full"
           >
+            {/* Media */}
             {activeTab === 'uploads' && <UploadsPanel />}
-            {activeTab === 'stock' && <StockPhotoBrowser />}
-            {activeTab === 'giphy' && <GiphyBrowser />}
+            {activeTab === 'stock' && <StockPhotoBrowserWrapper />}
+            {activeTab === 'giphy' && <GiphyBrowserWrapper />}
+            
+            {/* Elements - these typically don't require props */}
             {activeTab === 'shapes' && <ShapesBrowser />}
             {activeTab === 'icons' && <IconsBrowser />}
             {activeTab === 'stickers' && <StickersBrowser />}
             {activeTab === 'frames' && <FramesBrowser />}
+            
+            {/* Design - these typically don't require props */}
             {activeTab === 'backgrounds' && <BackgroundPicker />}
             {activeTab === 'gradients' && <GradientsBrowser />}
             {activeTab === 'patterns' && <PatternPicker />}
             {activeTab === 'palettes' && <ColorPalettePicker />}
             {activeTab === 'filters' && <FiltersBrowser />}
             {activeTab === 'text-effects' && <TextEffectsPanel />}
+            
+            {/* Tools - these typically don't require props */}
             {activeTab === 'templates' && <TemplateGallery />}
             {activeTab === 'collage' && <CollageBuilder />}
             {activeTab === 'qrcode' && <QRCodeGenerator />}
             {activeTab === 'avatars' && <AvatarCreator />}
             {activeTab === 'ai-enhance' && <AIEnhancePanel />}
+            
+            {/* Premium */}
             {activeTab === 'store' && <PremiumStore />}
           </motion.div>
         </AnimatePresence>
