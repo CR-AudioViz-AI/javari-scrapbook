@@ -278,7 +278,7 @@ export async function GET(request: NextRequest) {
     );
   }
   
-  const categories = [...new Set(icons.map(i => i.category))];
+  const categories = Array.from(new Set(icons.map(i => i.category)));
   
   return NextResponse.json({
     icons: filteredIcons.map(i => ({
