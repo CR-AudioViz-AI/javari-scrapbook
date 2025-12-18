@@ -1,8 +1,7 @@
 'use client';
 
 // CRAV Scrapbook - Main Editor Page
-// Complete scrapbooking editor with all features, onboarding, and enhanced asset panel
-// Timestamp: Tuesday, December 17, 2025 – 9:40 PM Eastern Time
+// Complete scrapbooking editor with all features and onboarding
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -10,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useScrapbookStore, createPhotoElement, createTextElement } from '@/lib/store';
 import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { EditorCanvas } from '@/components/editor/EditorCanvas';
-import { EnhancedAssetsPanel } from '@/components/editor/EnhancedAssetsPanel';
+import { AssetsPanel } from '@/components/editor/AssetsPanel';
 import { PropertiesPanel } from '@/components/editor/PropertiesPanel';
 import { EnhancedPagesPanel } from '@/components/editor/EnhancedPagesPanel';
 import { OnboardingOverlay, KeyboardShortcutsModal, EmptyCanvasPrompt } from '@/components/Onboarding';
@@ -27,9 +26,6 @@ import {
   HelpCircle,
   Keyboard,
   Sparkles,
-  Download,
-  Share2,
-  Settings,
 } from 'lucide-react';
 
 function createNewScrapbook(title: string = 'Untitled Scrapbook'): Scrapbook {
@@ -79,7 +75,6 @@ export default function EditorPage() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const {
     scrapbook,
@@ -109,30 +104,9 @@ export default function EditorPage() {
   // Keyboard shortcuts handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Show shortcuts modal
       if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         setShowShortcuts(true);
-      }
-      // Toggle left panel
-      if (e.key === '[' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        setShowLeftPanel(prev => !prev);
-      }
-      // Toggle right panel
-      if (e.key === ']' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        setShowRightPanel(prev => !prev);
-      }
-      // Toggle pages panel
-      if (e.key === 'p' && (e.ctrlKey || e.metaKey) && e.shiftKey) {
-        e.preventDefault();
-        setShowPagesPanel(prev => !prev);
-      }
-      // Save
-      if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        handleSave();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -291,9 +265,6 @@ export default function EditorPage() {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <span className="hidden sm:block text-sm font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-            CRAV Scrapbook
-          </span>
         </div>
 
         {/* Title */}
@@ -308,7 +279,7 @@ export default function EditorPage() {
         </div>
 
         {/* Status & Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <AnimatePresence mode="wait">
             {saveStatus === 'saving' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2 text-sm text-gray-500">
@@ -322,16 +293,14 @@ export default function EditorPage() {
             )}
           </AnimatePresence>
 
-          {/* Keyboard Shortcuts */}
           <button
             onClick={() => setShowShortcuts(true)}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors hidden sm:block"
-            title="Keyboard shortcuts (?)"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            title="Keyboard shortcuts"
           >
             <Keyboard className="w-5 h-5 text-gray-500" />
           </button>
 
-          {/* Help */}
           <button
             onClick={() => setShowOnboarding(true)}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -340,38 +309,6 @@ export default function EditorPage() {
             <HelpCircle className="w-5 h-5 text-gray-500" />
           </button>
 
-          {/* Export */}
-          <div className="relative">
-            <button
-              onClick={() => setShowExportMenu(!showExportMenu)}
-              className="flex items-center gap-2 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              title="Export"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline text-sm">Export</span>
-            </button>
-            
-            <AnimatePresence>
-              {showExportMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 z-50"
-                >
-                  <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Export as PNG</button>
-                  <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Export as PDF</button>
-                  <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Export as JPG</button>
-                  <hr className="my-1 border-gray-200 dark:border-gray-700" />
-                  <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
-                    <Share2 className="w-4 h-4" /> Share Link
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Save Button */}
           <button onClick={handleSave} disabled={isSaving} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium">
             <Save className="w-4 h-4" /> Save
           </button>
@@ -383,11 +320,11 @@ export default function EditorPage() {
 
       {/* Main editor area */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Left panel - Enhanced Assets Panel */}
+        {/* Left panel - Assets */}
         <AnimatePresence>
           {showLeftPanel && (
             <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 288, opacity: 1 }} exit={{ width: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="shrink-0 overflow-hidden">
-              <EnhancedAssetsPanel />
+              <AssetsPanel />
             </motion.div>
           )}
         </AnimatePresence>
@@ -431,25 +368,22 @@ export default function EditorPage() {
       {/* Panel toggles */}
       <button
         onClick={() => setShowLeftPanel(!showLeftPanel)}
-        className="fixed left-0 top-1/2 -translate-y-1/2 z-10 p-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-r-lg shadow-md hover:shadow-lg transition-all"
+        className="fixed left-0 top-1/2 -translate-y-1/2 z-10 p-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-r-lg shadow-md hover:shadow-lg transition-shadow"
         style={{ left: showLeftPanel ? '288px' : '0' }}
-        title={showLeftPanel ? 'Hide assets panel (Ctrl+[)' : 'Show assets panel (Ctrl+[)'}
       >
         <PanelLeftClose className={`w-4 h-4 transition-transform ${showLeftPanel ? '' : 'rotate-180'}`} />
       </button>
       <button
         onClick={() => setShowRightPanel(!showRightPanel)}
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-10 p-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-l-lg shadow-md hover:shadow-lg transition-all"
+        className="fixed right-0 top-1/2 -translate-y-1/2 z-10 p-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-l-lg shadow-md hover:shadow-lg transition-shadow"
         style={{ right: showRightPanel ? '280px' : '0' }}
-        title={showRightPanel ? 'Hide properties panel (Ctrl+])' : 'Show properties panel (Ctrl+])'}
       >
         <PanelRightClose className={`w-4 h-4 transition-transform ${showRightPanel ? '' : 'rotate-180'}`} />
       </button>
       <button
         onClick={() => setShowPagesPanel(!showPagesPanel)}
-        className="fixed bottom-0 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-t-lg shadow-md hover:shadow-lg transition-all text-xs font-medium"
+        className="fixed bottom-0 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-t-lg shadow-md hover:shadow-lg transition-shadow text-xs font-medium"
         style={{ bottom: showPagesPanel ? '140px' : '0' }}
-        title={showPagesPanel ? 'Hide pages (Ctrl+Shift+P)' : 'Show pages (Ctrl+Shift+P)'}
       >
         {showPagesPanel ? 'Hide Pages' : 'Show Pages'}
       </button>
@@ -467,14 +401,6 @@ export default function EditorPage() {
           <KeyboardShortcutsModal onClose={() => setShowShortcuts(false)} />
         )}
       </AnimatePresence>
-
-      {/* Click outside to close export menu */}
-      {showExportMenu && (
-        <div 
-          className="fixed inset-0 z-40" 
-          onClick={() => setShowExportMenu(false)}
-        />
-      )}
     </div>
   );
 }
