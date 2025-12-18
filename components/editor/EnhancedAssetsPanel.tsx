@@ -15,24 +15,25 @@ import {
 } from 'lucide-react';
 
 // Lazy load heavy components for better performance
-const StockPhotoBrowser = lazy(() => import('./StockPhotoBrowser').then(m => ({ default: m.StockPhotoBrowser })));
-const GiphyBrowser = lazy(() => import('./GiphyBrowser').then(m => ({ default: m.GiphyBrowser })));
-const IconsBrowser = lazy(() => import('./IconsBrowser').then(m => ({ default: m.IconsBrowser })));
-const GradientsBrowser = lazy(() => import('./GradientsBrowser').then(m => ({ default: m.GradientsBrowser })));
-const FiltersBrowser = lazy(() => import('./FiltersBrowser').then(m => ({ default: m.FiltersBrowser })));
-const FramesBrowser = lazy(() => import('./FramesBrowser').then(m => ({ default: m.FramesBrowser })));
-const StickersBrowser = lazy(() => import('./StickersBrowser').then(m => ({ default: m.StickersBrowser })));
-const ShapesBrowser = lazy(() => import('./ShapesBrowser').then(m => ({ default: m.ShapesBrowser })));
-const QRCodeGenerator = lazy(() => import('./QRCodeGenerator').then(m => ({ default: m.QRCodeGenerator })));
-const AvatarCreator = lazy(() => import('./AvatarCreator').then(m => ({ default: m.AvatarCreator })));
-const CollageBuilder = lazy(() => import('./CollageBuilder').then(m => ({ default: m.CollageBuilder })));
-const BackgroundPicker = lazy(() => import('./BackgroundPicker').then(m => ({ default: m.BackgroundPicker })));
-const PatternPicker = lazy(() => import('./PatternPicker').then(m => ({ default: m.PatternPicker })));
-const ColorPalettePicker = lazy(() => import('./ColorPalettePicker').then(m => ({ default: m.ColorPalettePicker })));
-const TextEffectsPanel = lazy(() => import('./TextEffectsPanel').then(m => ({ default: m.TextEffectsPanel })));
-const TemplateGallery = lazy(() => import('./TemplateGallery').then(m => ({ default: m.TemplateGallery })));
-const PremiumStore = lazy(() => import('./PremiumStore').then(m => ({ default: m.PremiumStore })));
-const AIEnhancePanel = lazy(() => import('./AIEnhancePanel').then(m => ({ default: m.AIEnhancePanel })));
+// Components use default exports
+const StockPhotoBrowser = lazy(() => import('./StockPhotoBrowser'));
+const GiphyBrowser = lazy(() => import('./GiphyBrowser'));
+const IconsBrowser = lazy(() => import('./IconsBrowser'));
+const GradientsBrowser = lazy(() => import('./GradientsBrowser'));
+const FiltersBrowser = lazy(() => import('./FiltersBrowser'));
+const FramesBrowser = lazy(() => import('./FramesBrowser'));
+const StickersBrowser = lazy(() => import('./StickersBrowser'));
+const ShapesBrowser = lazy(() => import('./ShapesBrowser'));
+const QRCodeGenerator = lazy(() => import('./QRCodeGenerator'));
+const AvatarCreator = lazy(() => import('./AvatarCreator'));
+const CollageBuilder = lazy(() => import('./CollageBuilder'));
+const BackgroundPicker = lazy(() => import('./BackgroundPicker'));
+const PatternPicker = lazy(() => import('./PatternPicker'));
+const ColorPalettePicker = lazy(() => import('./ColorPalettePicker'));
+const TextEffectsPanel = lazy(() => import('./TextEffectsPanel'));
+const TemplateGallery = lazy(() => import('./TemplateGallery'));
+const PremiumStore = lazy(() => import('./PremiumStore'));
+const AIEnhancePanel = lazy(() => import('./AIEnhancePanel'));
 
 // Category definitions
 type CategoryId = 'media' | 'elements' | 'design' | 'tools' | 'premium';
