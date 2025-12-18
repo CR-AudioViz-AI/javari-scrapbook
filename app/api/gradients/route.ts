@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Gradient not found' }, { status: 404 });
   }
   
-  const categories = [...new Set(gradients.map(g => g.category))];
+  const categories = Array.from(new Set(gradients.map(g => g.category)));
   
   return NextResponse.json({
     gradients: filteredGradients,
