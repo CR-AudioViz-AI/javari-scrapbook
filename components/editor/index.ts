@@ -1,6 +1,7 @@
 // components/editor/index.ts
 // Export all editor components for easy importing
-// Timestamp: Tuesday, December 17, 2025 – 9:45 PM Eastern Time
+// Timestamp: Friday, December 20, 2025 – 9:02 PM Eastern Time
+// FIX: Removed EnhancedAssetsPanel export (file was deleted due to build errors)
 
 // Core Editor Components (with default exports)
 export { default as EditorCanvas } from './EditorCanvas';
@@ -8,7 +9,6 @@ export { default as EditorToolbar } from './EditorToolbar';
 export { default as PropertiesPanel } from './PropertiesPanel';
 export { default as PagesPanel } from './PagesPanel';
 export { default as AssetsPanel } from './AssetsPanel';
-export { default as EnhancedAssetsPanel } from './EnhancedAssetsPanel';
 
 // Components with named exports - re-export everything
 export * from './EnhancedPagesPanel';
