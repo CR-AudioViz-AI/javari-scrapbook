@@ -2,10 +2,10 @@
 
 // CRAV Scrapbook - Comprehensive Assets Panel
 // All 24+ components organized into logical categories with tabbed navigation
-// FIX: Properly handle required props for browser components with default handlers
-// Timestamp: Tuesday, December 17, 2025 – 10:20 PM Eastern Time
+// FIX: Use ComponentType<any> for lazy components to preserve props typing
+// Timestamp: Friday, December 20, 2025 – 8:45 PM Eastern Time
 
-import React, { useState, useCallback, Suspense, lazy } from 'react';
+import React, { useState, useCallback, Suspense, lazy, ComponentType } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScrapbookStore, createStickerElement, createPhotoElement, createShapeElement } from '@/lib/store';
 import { 
@@ -15,26 +15,81 @@ import {
   Loader2, ChevronDown, ChevronRight, X, RefreshCw, Heart, Smile
 } from 'lucide-react';
 
-// Lazy load heavy components - safe for both named and default exports
-const StockPhotoBrowser = lazy(() => import('./StockPhotoBrowser').then(m => ({ default: (m as any).StockPhotoBrowser ?? (m as any).default })));
-const GiphyBrowser = lazy(() => import('./GiphyBrowser').then(m => ({ default: (m as any).GiphyBrowser ?? (m as any).default })));
-const IconsBrowser = lazy(() => import('./IconsBrowser').then(m => ({ default: (m as any).IconsBrowser ?? (m as any).default })));
-const GradientsBrowser = lazy(() => import('./GradientsBrowser').then(m => ({ default: (m as any).GradientsBrowser ?? (m as any).default })));
-const FiltersBrowser = lazy(() => import('./FiltersBrowser').then(m => ({ default: (m as any).FiltersBrowser ?? (m as any).default })));
-const FramesBrowser = lazy(() => import('./FramesBrowser').then(m => ({ default: (m as any).FramesBrowser ?? (m as any).default })));
-const StickersBrowser = lazy(() => import('./StickersBrowser').then(m => ({ default: (m as any).StickersBrowser ?? (m as any).default })));
-const ShapesBrowser = lazy(() => import('./ShapesBrowser').then(m => ({ default: (m as any).ShapesBrowser ?? (m as any).default })));
-const QRCodeGenerator = lazy(() => import('./QRCodeGenerator').then(m => ({ default: (m as any).QRCodeGenerator ?? (m as any).default })));
-const AvatarCreator = lazy(() => import('./AvatarCreator').then(m => ({ default: (m as any).AvatarCreator ?? (m as any).default })));
-const CollageBuilder = lazy(() => import('./CollageBuilder').then(m => ({ default: (m as any).CollageBuilder ?? (m as any).default })));
-const BackgroundPicker = lazy(() => import('./BackgroundPicker').then(m => ({ default: (m as any).BackgroundPicker ?? (m as any).default })));
-const PatternPicker = lazy(() => import('./PatternPicker').then(m => ({ default: (m as any).PatternPicker ?? (m as any).default })));
-const ColorPalettePicker = lazy(() => import('./ColorPalettePicker').then(m => ({ default: (m as any).ColorPalettePicker ?? (m as any).default })));
-const TextEffectsPanel = lazy(() => import('./TextEffectsPanel').then(m => ({ default: (m as any).TextEffectsPanel ?? (m as any).default })));
-const TemplateGallery = lazy(() => import('./TemplateGallery').then(m => ({ default: (m as any).TemplateGallery ?? (m as any).default })));
-const PremiumStore = lazy(() => import('./PremiumStore').then(m => ({ default: (m as any).PremiumStore ?? (m as any).default })));
-const AIEnhancePanel = lazy(() => import('./AIEnhancePanel').then(m => ({ default: (m as any).AIEnhancePanel ?? (m as any).default })));
+// Type helper for lazy-loaded components - allows any props
+type LazyComponent = ComponentType<any>;
 
+// Lazy load heavy components with proper typing
+const StockPhotoBrowser: LazyComponent = lazy(() => 
+  import('./StockPhotoBrowser').then(m => ({ default: m.StockPhotoBrowser || m.default }))
+) as unknown as LazyComponent;
+
+const GiphyBrowser: LazyComponent = lazy(() => 
+  import('./GiphyBrowser').then(m => ({ default: m.GiphyBrowser || m.default }))
+) as unknown as LazyComponent;
+
+const IconsBrowser: LazyComponent = lazy(() => 
+  import('./IconsBrowser').then(m => ({ default: m.IconsBrowser || m.default }))
+) as unknown as LazyComponent;
+
+const GradientsBrowser: LazyComponent = lazy(() => 
+  import('./GradientsBrowser').then(m => ({ default: m.GradientsBrowser || m.default }))
+) as unknown as LazyComponent;
+
+const FiltersBrowser: LazyComponent = lazy(() => 
+  import('./FiltersBrowser').then(m => ({ default: m.FiltersBrowser || m.default }))
+) as unknown as LazyComponent;
+
+const FramesBrowser: LazyComponent = lazy(() => 
+  import('./FramesBrowser').then(m => ({ default: m.FramesBrowser || m.default }))
+) as unknown as LazyComponent;
+
+const StickersBrowser: LazyComponent = lazy(() => 
+  import('./StickersBrowser').then(m => ({ default: m.StickersBrowser || m.default }))
+) as unknown as LazyComponent;
+
+const ShapesBrowser: LazyComponent = lazy(() => 
+  import('./ShapesBrowser').then(m => ({ default: m.ShapesBrowser || m.default }))
+) as unknown as LazyComponent;
+
+const QRCodeGenerator: LazyComponent = lazy(() => 
+  import('./QRCodeGenerator').then(m => ({ default: m.QRCodeGenerator || m.default }))
+) as unknown as LazyComponent;
+
+const AvatarCreator: LazyComponent = lazy(() => 
+  import('./AvatarCreator').then(m => ({ default: m.AvatarCreator || m.default }))
+) as unknown as LazyComponent;
+
+const CollageBuilder: LazyComponent = lazy(() => 
+  import('./CollageBuilder').then(m => ({ default: m.CollageBuilder || m.default }))
+) as unknown as LazyComponent;
+
+const BackgroundPicker: LazyComponent = lazy(() => 
+  import('./BackgroundPicker').then(m => ({ default: m.BackgroundPicker || m.default }))
+) as unknown as LazyComponent;
+
+const PatternPicker: LazyComponent = lazy(() => 
+  import('./PatternPicker').then(m => ({ default: m.PatternPicker || m.default }))
+) as unknown as LazyComponent;
+
+const ColorPalettePicker: LazyComponent = lazy(() => 
+  import('./ColorPalettePicker').then(m => ({ default: m.ColorPalettePicker || m.default }))
+) as unknown as LazyComponent;
+
+const TextEffectsPanel: LazyComponent = lazy(() => 
+  import('./TextEffectsPanel').then(m => ({ default: m.TextEffectsPanel || m.default }))
+) as unknown as LazyComponent;
+
+const TemplateGallery: LazyComponent = lazy(() => 
+  import('./TemplateGallery').then(m => ({ default: m.TemplateGallery || m.default }))
+) as unknown as LazyComponent;
+
+const PremiumStore: LazyComponent = lazy(() => 
+  import('./PremiumStore').then(m => ({ default: m.PremiumStore || m.default }))
+) as unknown as LazyComponent;
+
+const AIEnhancePanel: LazyComponent = lazy(() => 
+  import('./AIEnhancePanel').then(m => ({ default: m.AIEnhancePanel || m.default }))
+) as unknown as LazyComponent;
 // Category definitions
 type CategoryId = 'media' | 'elements' | 'design' | 'tools' | 'premium';
 type TabId = 
