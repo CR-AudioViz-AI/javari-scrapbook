@@ -4,6 +4,9 @@
 
 import { NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 interface Frame {
   id: string;
   name: string;

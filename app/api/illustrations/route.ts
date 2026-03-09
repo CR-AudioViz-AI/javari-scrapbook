@@ -4,6 +4,9 @@
 
 import { NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 // Curated illustration categories with unDraw-style URLs
 const ILLUSTRATION_CATEGORIES = {
   people: [

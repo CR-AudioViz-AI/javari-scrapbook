@@ -3,6 +3,9 @@
 
 import { NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 const COLOR_PALETTES = {
   pastel: [
     { id: 'pastel-1', name: 'Cotton Candy', colors: ['#FFB5E8', '#FF9CEE', '#FFCCF9', '#FCC2FF', '#F6A6FF'] },

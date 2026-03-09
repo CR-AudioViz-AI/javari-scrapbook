@@ -3,6 +3,9 @@
 
 import { NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 const UNSPLASH_KEY = process.env.UNSPLASH_ACCESS_KEY || 'demo';
 const PEXELS_KEY = process.env.PEXELS_API_KEY || 'demo';
 const PIXABAY_KEY = process.env.PIXABAY_API_KEY || 'demo';

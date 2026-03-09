@@ -3,6 +3,9 @@
 
 import { NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 // Free tier limits for various services
 const FREE_APIS = {
   removeBg: process.env.REMOVE_BG_API_KEY,

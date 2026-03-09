@@ -4,6 +4,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 const GIPHY_API_KEY = process.env.GIPHY_API_KEY;
 
 export async function GET(request: NextRequest) {

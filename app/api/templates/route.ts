@@ -4,6 +4,9 @@
 import { NextResponse } from 'next/server';
 import { TEMPLATES, TEMPLATE_CATEGORIES, getTemplatesByCategory, searchTemplates } from '@/lib/data/templates';
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');

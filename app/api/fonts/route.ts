@@ -3,6 +3,9 @@
 
 import { NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 const GOOGLE_FONTS_API = 'https://www.googleapis.com/webfonts/v1/webfonts';
 const GOOGLE_FONTS_KEY = process.env.GOOGLE_FONTS_API_KEY || '';
 

@@ -4,6 +4,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
 export async function GET(request: NextRequest) {

@@ -4,6 +4,9 @@
 
 import { NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 // DiceBear styles (all free, no limits)
 const DICEBEAR_STYLES = [
   { id: 'adventurer', name: 'Adventurer', description: 'Illustrated adventure characters' },

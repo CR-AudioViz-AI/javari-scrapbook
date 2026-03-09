@@ -4,6 +4,9 @@
 
 import { NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const data = searchParams.get('data') || searchParams.get('text') || 'https://craudiovizai.com';
