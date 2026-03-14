@@ -1,6 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "github": {
-    "autoAlias": false
-  }
+    "autoAlias": false,
+    "enabled": true,
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
+  "ignoreCommand": "git log -1 --pretty=%B | grep -q 'dependabot' && exit 0 || exit 1"
 }
