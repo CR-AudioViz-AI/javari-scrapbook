@@ -1,29 +1,49 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+// middleware.ts
+// CR AudioViz AI - Javari Scrapbook
+// Authentication middleware using @supabase/ssr (modern pattern)
+// Updated: 2026-03-14
+
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
+  let response = NextResponse.next({ request: { headers: req.headers } })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) { return req.cookies.get(name)?.value },
+        set(name: string, value: string, options: CookieOptions) {
+          req.cookies.set({ name, value, ...options })
+          response = NextResponse.next({ request: { headers: req.headers } })
+          response.cookies.set({ name, value, ...options })
+        },
+        remove(name: string, options: CookieOptions) {
+          req.cookies.set({ name, value: '', ...options })
+          response = NextResponse.next({ request: { headers: req.headers } })
+          response.cookies.set({ name, value: '', ...options })
+        },
+      },
+    }
+  )
+
   const { data: { session } } = await supabase.auth.getSession()
 
-  // Protected routes - dashboard only for now (editor open for testing)
-  if (req.nextUrl.pathname.startsWith('/dashboard')) {
-    if (!session) {
-      return NextResponse.redirect(new URL('/login', req.url))
-    }
+  if (req.nextUrl.pathname.startsWith('/dashboard') && !session) {
+    return NextResponse.redirect(new URL('/login', req.url))
+  }
+  if (req.nextUrl.pathname.startsWith('/creator') && !session) {
+    return NextResponse.redirect(new URL('/login', req.url))
+  }
+  if ((req.nextUrl.pathname.startsWith('/login') || req.nextUrl.pathname.startsWith('/signup')) && session) {
+    return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
-  // Auth routes - redirect if logged in
-  if (req.nextUrl.pathname.startsWith('/login') || req.nextUrl.pathname.startsWith('/signup')) {
-    if (session) {
-      return NextResponse.redirect(new URL('/dashboard', req.url))
-    }
-  }
-
-  return res
+  return response
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/signup'],
+  matcher: ['/dashboard/:path*', '/creator/:path*', '/login', '/signup'],
 }
