@@ -1,33 +1,16 @@
-name: Dependabot Auto-Merge
-on: pull_request_target
+# .github/workflows/dependabot-automerge.yml
+# Disabled - dependabot PR builds were triggering unnecessary Vercel deployments
+# Henderson Standard: preview-only by default, Roy confirms before production
+# Updated: 2026-03-14
 
-permissions:
-  pull-requests: write
-  contents: write
+name: Dependabot Auto-merge (Disabled)
+
+on:
+  workflow_dispatch:
 
 jobs:
-  dependabot:
+  # Intentionally empty - workflow disabled to prevent auto-deploys from dependabot PRs
+  disabled:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
     steps:
-      - name: Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@v1
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      
-      - name: Enable auto-merge for Dependabot PRs
-        if: |
-          steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
-          steps.metadata.outputs.update-type == 'version-update:semver-minor'
-        run: gh pr merge --auto --squash "$PR_URL"
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Approve security patches
-        if: contains(steps.metadata.outputs.dependency-names, 'security')
-        run: gh pr review --approve "$PR_URL"
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: echo "Dependabot automerge disabled per Henderson Standard"
