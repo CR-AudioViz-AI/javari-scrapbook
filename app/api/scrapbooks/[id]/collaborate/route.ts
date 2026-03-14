@@ -1,19 +1,39 @@
 // app/api/scrapbooks/[id]/collaborate/route.ts
 // Real-time Collaboration Features
 
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+function createSupabaseSSRClient() {
+  const cookieStore = cookies()
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) { return cookieStore.get(name)?.value },
+        set(name: string, value: string, options: CookieOptions) {
+          try { cookieStore.set({ name, value, ...options }) } catch {}
+        },
+        remove(name: string, options: CookieOptions) {
+          try { cookieStore.set({ name, value: '', ...options }) } catch {}
+        },
+      },
+    }
+  )
+}
+
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createSupabaseSSRClient();
     
     const { data: collaborators, error } = await supabase
       .from('scrapbook_collaborators')
@@ -36,7 +56,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createSupabaseSSRClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -100,7 +120,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createSupabaseSSRClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
