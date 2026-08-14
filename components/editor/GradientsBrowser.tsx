@@ -1,6 +1,6 @@
 'use client';
 
-// CRAV Scrapbook - Gradients Browser Component
+// javari Scrapbook - Gradients Browser Component
 // Browse and apply 100+ beautiful gradients to backgrounds
 
 import React, { useState, useEffect, useCallback } from 'react';

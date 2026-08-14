@@ -1,4 +1,4 @@
-// CRAV Scrapbook - Enhanced Patterns API
+// javari Scrapbook - Enhanced Patterns API
 // 50+ Free SVG Patterns for scrapbook backgrounds
 // Categories: geometric, organic, dots, lines, waves, abstract, seasonal, vintage
 

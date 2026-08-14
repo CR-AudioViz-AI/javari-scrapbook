@@ -114,7 +114,7 @@ export default function DashboardPage() {
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                  CRAV Scrapbook
+                  javari Scrapbook
                 </span>
               </Link>
             </div>

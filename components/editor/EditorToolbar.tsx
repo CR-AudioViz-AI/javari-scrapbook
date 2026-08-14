@@ -1,6 +1,6 @@
 'use client';
 
-// CRAV Scrapbook - Fixed Editor Toolbar
+// javari Scrapbook - Fixed Editor Toolbar
 // Fixed: State subscription and photo upload functionality
 
 import React, { useRef, useCallback } from 'react';

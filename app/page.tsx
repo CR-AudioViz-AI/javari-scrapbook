@@ -1,7 +1,7 @@
 'use client';
 
 // app/page.tsx
-// Beautiful landing page for CRAV Scrapbook
+// Beautiful landing page for javari Scrapbook
 
 import React from 'react';
 import Link from 'next/link';
@@ -40,7 +40,7 @@ export default function LandingPage() {
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                CRAV Scrapbook
+                javari Scrapbook
               </span>
             </div>
             
@@ -259,7 +259,7 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">CRAV Scrapbook</span>
+              <span className="text-xl font-bold text-white">javari Scrapbook</span>
             </div>
             
             <div className="flex items-center gap-8">

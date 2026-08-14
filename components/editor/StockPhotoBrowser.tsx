@@ -1,6 +1,6 @@
 'use client';
 
-// CRAV Scrapbook - Stock Photo Browser
+// javari Scrapbook - Stock Photo Browser
 // Browse free stock photos from Unsplash/Pexels APIs
 // FIX: Made onClose/onSelect optional with default auto-add behavior
 // Timestamp: Tuesday, December 17, 2025 – 10:10 PM Eastern Time

@@ -1,6 +1,6 @@
 'use client';
 
-// CRAV Scrapbook - Main Editor Page
+// javari Scrapbook - Main Editor Page
 // Complete scrapbooking editor with all features and onboarding
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -90,14 +90,14 @@ export default function EditorPage() {
 
   // Check for first-time user
   useEffect(() => {
-    const hasSeenOnboarding = localStorage.getItem('crav-scrapbook-onboarding');
+    const hasSeenOnboarding = localStorage.getItem('javari-scrapbook-onboarding');
     if (!hasSeenOnboarding) {
       setShowOnboarding(true);
     }
   }, []);
 
   const handleOnboardingComplete = () => {
-    localStorage.setItem('crav-scrapbook-onboarding', 'true');
+    localStorage.setItem('javari-scrapbook-onboarding', 'true');
     setShowOnboarding(false);
   };
 

@@ -1,6 +1,6 @@
 'use client';
 
-// CRAV Scrapbook - Giphy Browser
+// javari Scrapbook - Giphy Browser
 // Browse GIFs and animated stickers from Giphy API
 // FIX: Made onClose/onSelect optional with default auto-add behavior
 // Timestamp: Tuesday, December 17, 2025 – 10:15 PM Eastern Time

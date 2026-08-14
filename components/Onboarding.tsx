@@ -1,6 +1,6 @@
 'use client';
 
-// CRAV Scrapbook - Beautiful Onboarding & Quick Start Guide
+// javari Scrapbook - Beautiful Onboarding & Quick Start Guide
 // First-time user experience and helpful tips
 
 import React, { useState, useEffect } from 'react';
@@ -32,7 +32,7 @@ interface OnboardingProps {
 const steps = [
   {
     id: 'welcome',
-    title: 'Welcome to CRAV Scrapbook! ✨',
+    title: 'Welcome to javari Scrapbook! ✨',
     description: 'Create beautiful digital scrapbooks with our powerful yet easy-to-use editor. Let\'s take a quick tour!',
     icon: BookOpen,
     color: 'from-pink-500 via-purple-500 to-indigo-500',

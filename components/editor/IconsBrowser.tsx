@@ -1,6 +1,6 @@
 'use client';
 
-// CRAV Scrapbook - Icons Browser Component
+// javari Scrapbook - Icons Browser Component
 // Browse 170+ free SVG icons for scrapbook embellishments
 
 import React, { useState, useEffect, useCallback } from 'react';

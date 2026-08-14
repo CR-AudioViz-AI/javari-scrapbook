@@ -54,7 +54,7 @@ export default function TemplatesPage() {
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-scrapbook-rose to-scrapbook-lavender flex items-center justify-center">
                 <Book className="w-5 h-5 text-white" />
               </div>
-              <span className="font-display text-2xl font-bold text-gray-800">CRAVScrapbook</span>
+              <span className="font-display text-2xl font-bold text-gray-800">JavariScrapbook</span>
             </Link>
             <div className="flex items-center gap-4">
               <Link href="/login" className="text-gray-600 hover:text-scrapbook-rose transition">

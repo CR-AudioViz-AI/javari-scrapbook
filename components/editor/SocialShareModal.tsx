@@ -55,7 +55,7 @@ export default function SocialShareModal({
   const [shareLink, setShareLink] = useState('');
 
   const generateShareLink = () => {
-    const link = `https://crav-scrapbook.vercel.app/share/${Date.now().toString(36)}`;
+    const link = `https://javari-scrapbook.vercel.app/share/${Date.now().toString(36)}`;
     setShareLink(link);
     return link;
   };

@@ -1,8 +1,8 @@
-# 🎨 CRAV Scrapbook
+# 🎨 javari Scrapbook
 
 > **Your Story. Our Design.** - World-class digital scrapbooking platform with AI-powered tools.
 
-![CRAV Scrapbook](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
+![javari Scrapbook](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
 ![Next.js](https://img.shields.io/badge/Next.js-14.1.0-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![License](https://img.shields.io/badge/License-Proprietary-red)
@@ -78,8 +78,8 @@ Connect with popular print services:
 
 ```bash
 # Clone repository
-git clone https://github.com/CR-AudioViz-AI/crav-scrapbook.git
-cd crav-scrapbook
+git clone https://github.com/CR-AudioViz-AI/javari-scrapbook.git
+cd javari-scrapbook
 
 # Install dependencies
 npm install
@@ -123,7 +123,7 @@ Run the SQL schema in your Supabase SQL Editor:
 ## 📁 Project Structure
 
 ```
-crav-scrapbook/
+javari-scrapbook/
 ├── app/
 │   ├── api/
 │   │   ├── scrapbooks/       # CRUD operations

@@ -1,4 +1,4 @@
-// CRAV Scrapbook - Free Icons API
+// javari Scrapbook - Free Icons API
 // 200+ SVG icons organized by category for scrapbook embellishments
 
 import { NextRequest, NextResponse } from 'next/server';

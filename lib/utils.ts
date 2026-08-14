@@ -1,5 +1,5 @@
 // lib/utils.ts
-// Utility functions for CRAV Scrapbook
+// Utility functions for javari Scrapbook
 
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';

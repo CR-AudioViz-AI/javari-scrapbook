@@ -1,6 +1,6 @@
 'use client';
 
-// CRAV Scrapbook - Enhanced Assets Panel
+// javari Scrapbook - Enhanced Assets Panel
 // Integrates with all free APIs: shapes, stickers, filters, frames, backgrounds, patterns, etc.
 
 import React, { useState, useEffect, useCallback } from 'react';

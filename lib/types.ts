@@ -1,4 +1,4 @@
-// CRAV Scrapbook - Complete Type Definitions
+// javari Scrapbook - Complete Type Definitions
 
 export interface Position { x: number; y: number; }
 export interface Size { width: number; height: number; }

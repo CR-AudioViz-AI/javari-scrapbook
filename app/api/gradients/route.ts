@@ -1,4 +1,4 @@
-// CRAV Scrapbook - Gradients API
+// javari Scrapbook - Gradients API
 // 100+ Beautiful CSS Gradients for backgrounds
 // Categories: sunrise, sunset, ocean, nature, candy, neon, pastel, dark, metallic, seasonal
 

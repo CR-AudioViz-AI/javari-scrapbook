@@ -1,6 +1,6 @@
 'use client';
 
-// CRAV Scrapbook - Premium Store Component
+// javari Scrapbook - Premium Store Component
 // Browse and purchase premium patterns, templates, and assets
 
 import React, { useState, useEffect } from 'react';

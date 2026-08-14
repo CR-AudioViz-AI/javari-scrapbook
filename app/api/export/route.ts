@@ -96,9 +96,9 @@ function generatePDFConfig(scrapbook: any, options: any) {
       })),
       metadata: {
         title: scrapbook.title,
-        author: 'CRAV Scrapbook',
+        author: 'JAVARI Scrapbook',
         subject: scrapbook.description,
-        creator: 'CRAVScrapbook.com'
+        creator: 'JAVARIScrapbook.com'
       }
     },
     clientLibrary: 'jspdf',
@@ -186,7 +186,7 @@ function generatePrintConfig(scrapbook: any, options: any) {
 function generateShareConfig(scrapbook: any, options: any) {
   const { platform = 'link', quality = 'medium' } = options || {};
 
-  const shareUrl = `https://cravscrapbook.com/view/${scrapbook.id}`;
+  const shareUrl = `https://javariscrapbook.com/view/${scrapbook.id}`;
   const embedCode = `<iframe src="${shareUrl}/embed" width="600" height="800" frameborder="0"></iframe>`;
 
   return NextResponse.json({

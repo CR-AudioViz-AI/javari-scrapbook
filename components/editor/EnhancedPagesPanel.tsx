@@ -1,6 +1,6 @@
 'use client';
 
-// CRAV Scrapbook - Enhanced Pages Panel with Beautiful Page Creation
+// javari Scrapbook - Enhanced Pages Panel with Beautiful Page Creation
 // Intuitive page management with templates and animations
 
 import React, { useState, useRef, useEffect } from 'react';
