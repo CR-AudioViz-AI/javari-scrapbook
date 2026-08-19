@@ -2,9 +2,23 @@
 // CR AudioViz AI - Javari Scrapbook Creator Profile API
 // Created: 2026-03-14
 
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+
+import { requireUser } from "@/lib/api/require-user";
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+
+// Service-role client. Identity comes from requireUser above; this only
+// reads and writes data.
+import { createClient as _mkClient } from '@supabase/supabase-js';
+function createSupabaseServiceClient() {
+  return _mkClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { persistSession: false },
+      global: { fetch: (u: RequestInfo | URL, o?: RequestInit) => fetch(u, { ...o, cache: 'no-store' }) } },
+  );
+}
+
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -15,21 +29,7 @@ export async function GET(
 ) {
   try {
     const cookieStore = cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) { return cookieStore.get(name)?.value },
-          set(name: string, value: string, options: CookieOptions) {
-            try { cookieStore.set({ name, value, ...options }) } catch {}
-          },
-          remove(name: string, options: CookieOptions) {
-            try { cookieStore.set({ name, value: '', ...options }) } catch {}
-          },
-        },
-      }
-    )
+    const supabase = createSupabaseServiceClient()
 
     const { data: profile, error: profileErr } = await supabase
       .from('profiles')
@@ -68,24 +68,16 @@ export async function PATCH(
 ) {
   try {
     const cookieStore = cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) { return cookieStore.get(name)?.value },
-          set(name: string, value: string, options: CookieOptions) {
-            try { cookieStore.set({ name, value, ...options }) } catch {}
-          },
-          remove(name: string, options: CookieOptions) {
-            try { cookieStore.set({ name, value: '', ...options }) } catch {}
-          },
-        },
-      }
-    )
+    const supabase = createSupabaseServiceClient()
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        // 2026-08-19: read the session from COOKIES via @supabase/auth-helpers or
+    // @supabase/ssr. Sessions live in localStorage on this platform and nothing
+    // writes a Supabase auth cookie, so this found no user and answered 401 to
+    // EVERYONE - signed in or not. It never errored; it took the unauthenticated
+    // path and looked like it worked. Same bug that broke 32 core routes.
+    const _auth = await requireUser(_request);
+    if (!_auth.ok) return _auth.res;
+    const user = { id: _auth.userId, email: _auth.email };if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const body = await request.json()
     const { display_name, bio, website } = body
