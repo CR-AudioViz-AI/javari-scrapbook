@@ -3,8 +3,7 @@
 // Public profile page for scrapbook creators
 // Created: 2026-03-14
 
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Book, Heart, Eye, Calendar, ArrowLeft, ExternalLink } from 'lucide-react'
@@ -24,20 +23,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CreatorProfilePage({ params }: Props) {
-  const cookieStore = cookies()
-  const supabase = createServerClient(
+  // 2026-08-20: this built a COOKIE client from @supabase/ssr to read a PUBLIC
+  // creator profile. The page never touches a session - no getUser, no
+  // getSession - so all of that cookie plumbing did nothing except drag in the
+  // forbidden client and force the route dynamic.
+  //
+  // A public page reads with the anon key and lets RLS decide what is visible.
+  const supabase = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: {
-        get(name: string) { return cookieStore.get(name)?.value },
-        set(name: string, value: string, options: CookieOptions) {
-          try { cookieStore.set({ name, value, ...options }) } catch {}
-        },
-        remove(name: string, options: CookieOptions) {
-          try { cookieStore.set({ name, value: '', ...options }) } catch {}
-        },
-      },
+      auth: { persistSession: false },
+      // Next 14 caches PostgREST GETs by URL and serves stale rows invisibly.
+      global: { fetch: (u: RequestInfo | URL, o?: RequestInit) => fetch(u, { ...o, cache: 'no-store' }) },
     }
   )
 
