@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Book, Heart, Eye, Calendar, ArrowLeft, ExternalLink } from 'lucide-react'
 import type { Metadata } from 'next'
+import { publishableKey, supabaseUrl } from "@craudioviz/platform-sdk";
 
 export const dynamic = 'force-dynamic'
 
@@ -30,8 +31,8 @@ export default async function CreatorProfilePage({ params }: Props) {
   //
   // A public page reads with the anon key and lets RLS decide what is visible.
   const supabase = createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl(),
+    publishableKey(),
     {
       auth: { persistSession: false },
       // Next 14 caches PostgREST GETs by URL and serves stale rows invisibly.
