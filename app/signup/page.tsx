@@ -117,7 +117,7 @@ export default function SignupPage() {
           </form>
           <p className="text-center text-sm text-gray-500 mt-4">
             Already have an account?{' '}
-            <Link href="/login" className="text-pink-600 hover:text-pink-700 font-medium">Sign in</Link>
+            <a href="https://craudiovizai.com/auth/login" className="text-pink-600 hover:text-pink-700 font-medium">Sign in</a>
           </p>
         </div>
       </motion.div>

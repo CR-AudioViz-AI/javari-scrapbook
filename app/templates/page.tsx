@@ -57,12 +57,12 @@ export default function TemplatesPage() {
               <span className="font-display text-2xl font-bold text-gray-800">JavariScrapbook</span>
             </Link>
             <div className="flex items-center gap-4">
-              <Link href="/login" className="text-gray-600 hover:text-scrapbook-rose transition">
+              <a href="https://craudiovizai.com/auth/login" className="text-gray-600 hover:text-scrapbook-rose transition">
                 Sign In
-              </Link>
-              <Link href="/signup" className="btn-scrapbook text-sm">
+              </a>
+              <a href="https://craudiovizai.com/auth/signup" className="btn-scrapbook text-sm">
                 Start Creating
-              </Link>
+              </a>
             </div>
           </div>
         </div>

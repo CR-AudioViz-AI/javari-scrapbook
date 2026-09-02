@@ -141,9 +141,9 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Don't have an account?{' '}
-            <Link href="/signup" className="text-pink-600 hover:text-pink-700 font-medium">
+            <a href="https://craudiovizai.com/auth/signup" className="text-pink-600 hover:text-pink-700 font-medium">
               Sign up free
-            </Link>
+            </a>
           </p>
         </div>
       </motion.div>

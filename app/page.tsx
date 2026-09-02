@@ -51,9 +51,9 @@ export default function LandingPage() {
             </div>
 
             <div className="flex items-center gap-4">
-              <Link href="/login" className="text-gray-600 dark:text-gray-300 hover:text-pink-500 transition">
+              <a href="https://craudiovizai.com/auth/login" className="text-gray-600 dark:text-gray-300 hover:text-pink-500 transition">
                 Sign In
-              </Link>
+              </a>
               <Link
                 href="/editor/new"
                 className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-medium hover:opacity-90 transition"
