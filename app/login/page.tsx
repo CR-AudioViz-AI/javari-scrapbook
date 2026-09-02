@@ -101,9 +101,9 @@ export default function LoginPage() {
 
             <div className="flex items-center justify-between text-sm">
               <span />
-              <Link href="/forgot-password" className="text-pink-600 hover:text-pink-700">
+              <a href="https://craudiovizai.com/forgot-password" className="text-pink-600 hover:text-pink-700">
                 Forgot password?
-              </Link>
+              </a>
             </div>
 
             <button
