@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     if (updateErr) throw updateErr
 
     // Telemetry
-    await supabase.from('activity_log').insert({
+    await supabase.from('javari_activity_log').insert({
       user_id: user.id,
       action: isPublic ? 'scrapbook_published' : 'scrapbook_unpublished',
       resource_type: 'scrapbook',
