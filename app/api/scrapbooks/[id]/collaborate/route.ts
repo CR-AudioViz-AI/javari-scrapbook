@@ -108,7 +108,7 @@ export async function POST(
     }
 
     // Log activity
-    await supabase.from('activity_log').insert({
+    await supabase.from('javari_activity_log').insert({
       scrapbook_id: params.id,
       user_id: user.id,
       action: 'collaborator_added',
