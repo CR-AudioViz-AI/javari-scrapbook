@@ -190,7 +190,7 @@ export async function POST(request: Request) {
     }
 
     // Log activity
-    await supabase.from('activity_log').insert({
+    await supabase.from('javari_activity_log').insert({
       scrapbook_id: scrapbook.id,
       user_id: user.id,
       action: 'created',
