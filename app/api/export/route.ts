@@ -75,7 +75,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Invalid format' }, { status: 400 });
     }
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'The request could not be completed.', code: 'INTERNAL_ERROR' }, { status: 500 });
   }
 }
 
