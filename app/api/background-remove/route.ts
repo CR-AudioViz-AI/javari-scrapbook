@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // app/api/background-remove/route.ts
 // Remove.bg API integration for background removal
 // Timestamp: Tuesday, December 24, 2025 – 1:08 PM Eastern Time
@@ -11,6 +12,9 @@ export const runtime = "nodejs";
 const REMOVE_BG_API_KEY = process.env.REMOVE_BG_API_KEY;
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   try {
     // Check for API key
     if (!REMOVE_BG_API_KEY) {
