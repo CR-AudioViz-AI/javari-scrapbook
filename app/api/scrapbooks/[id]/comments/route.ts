@@ -1,3 +1,4 @@
+import { readBody } from '@/lib/api/body';
 // app/api/scrapbooks/[id]/comments/route.ts
 // Comments and Annotations
 
@@ -77,7 +78,9 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
+    const parsed = await readBody<Record<string, unknown>>(request);
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.body as any;
     const { pageId, content, position } = body;
 
     const { data: comment, error } = await supabase
