@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = "force-dynamic";
@@ -166,6 +167,9 @@ const PATTERN_CATEGORIES = {
 };
 
 export async function GET(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');
   const search = searchParams.get('search');
