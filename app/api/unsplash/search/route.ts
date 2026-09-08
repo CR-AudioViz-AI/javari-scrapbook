@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // app/api/unsplash/search/route.ts
 // Unsplash Photo Search API
 // Timestamp: Tuesday, December 24, 2025 – 1:42 PM Eastern Time
@@ -10,6 +11,9 @@ export const runtime = "nodejs";
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
 export async function GET(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const searchParams = request.nextUrl.searchParams;
   const query = searchParams.get('query') || '';
   const page = searchParams.get('page') || '1';
