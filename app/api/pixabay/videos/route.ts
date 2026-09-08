@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // app/api/pixabay/videos/route.ts
 // Pixabay Videos API
 // Timestamp: Tuesday, December 24, 2025 – 2:26 PM Eastern Time
@@ -10,6 +11,9 @@ export const runtime = "nodejs";
 const PIXABAY_API_KEY = process.env.PIXABAY_API_KEY;
 
 export async function GET(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const searchParams = request.nextUrl.searchParams;
   const query = searchParams.get('q') || '';
   const page = searchParams.get('page') || '1';
