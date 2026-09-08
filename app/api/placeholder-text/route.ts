@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // app/api/placeholder-text/route.ts
 // Placeholder Text Generator
 // Lorem ipsum and themed text for scrapbook captions
@@ -132,6 +133,9 @@ function generateParagraphs(count: number): string {
 }
 
 export async function GET(request: Request) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type') || 'lorem';
   const words = parseInt(searchParams.get('words') || '50');
