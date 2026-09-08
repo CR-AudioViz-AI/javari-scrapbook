@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // app/api/color-palettes/route.ts
 // Color Palette Generator - Curated color schemes
 // Includes harmonious color combinations for scrapbooking
@@ -102,6 +103,9 @@ function getShades(hex: string, count: number = 5): string[] {
 }
 
 export async function GET(request: Request) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');
   const paletteId = searchParams.get('id');
