@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // app/api/illustrations/route.ts
 // FREE SVG Illustrations from multiple sources
 // unDraw (MIT), Open Peeps (CC0), Humaaans (free tier)
@@ -74,6 +75,9 @@ function generatePlaceholderSvg(name: string, color: string, width: number, heig
 }
 
 export async function GET(request: Request) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');
   const search = searchParams.get('search')?.toLowerCase();
