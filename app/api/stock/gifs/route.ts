@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // app/api/stock/gifs/route.ts
 // Giphy and Tenor GIF/Sticker Search
 
@@ -9,6 +10,9 @@ export const runtime = "nodejs";
 const GIPHY_KEY = process.env.GIPHY_API_KEY || 'demo';
 
 export async function GET(request: Request) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('query') || 'celebration';
   const type = searchParams.get('type') || 'stickers'; // gifs or stickers
