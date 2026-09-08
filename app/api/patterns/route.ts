@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // javari Scrapbook - Enhanced Patterns API
 // 50+ Free SVG Patterns for scrapbook backgrounds
 // Categories: geometric, organic, dots, lines, waves, abstract, seasonal, vintage
@@ -135,6 +136,9 @@ const defaultPattern = (c: string, bg: string, s: number) =>
   `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}"><rect fill="${bg}" width="${s}" height="${s}"/><circle cx="${s/2}" cy="${s/2}" r="${s/4}" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
 
 export async function GET(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
   const color = searchParams.get('color') || '6366f1';
