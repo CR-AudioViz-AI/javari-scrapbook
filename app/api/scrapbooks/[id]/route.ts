@@ -1,3 +1,4 @@
+import { readBody } from '@/lib/api/body';
 // app/api/scrapbooks/[id]/route.ts
 // Single scrapbook CRUD operations
 
@@ -132,7 +133,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
+    const parsed = await readBody<Record<string, unknown>>(request);
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.body as any;
     const updateData: any = {};
     
     if (body.title !== undefined) updateData.title = body.title;
