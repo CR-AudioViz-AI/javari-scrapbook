@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // app/api/stock/photos/route.ts
 // Free Stock Photo Search (Unsplash, Pexels, Pixabay)
 
@@ -11,6 +12,9 @@ const PEXELS_KEY = process.env.PEXELS_API_KEY || 'demo';
 const PIXABAY_KEY = process.env.PIXABAY_API_KEY || 'demo';
 
 export async function GET(request: Request) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('query') || 'scrapbook';
   const source = searchParams.get('source') || 'all';
