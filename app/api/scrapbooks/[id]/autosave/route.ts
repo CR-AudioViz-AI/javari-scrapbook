@@ -1,3 +1,4 @@
+import { readBody } from '@/lib/api/body';
 // app/api/scrapbooks/[id]/autosave/route.ts
 // Autosave endpoint for editor
 
@@ -21,7 +22,9 @@ export async function POST(
 ) {
   try {
     const supabase = getSupabase();
-    const body = await request.json();
+    const parsed = await readBody<Record<string, unknown>>(request);
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.body as any;
     const { pages, elements, metadata } = body;
 
     // Update scrapbook metadata if provided
