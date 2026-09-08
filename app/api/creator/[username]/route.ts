@@ -1,3 +1,4 @@
+import { readBody } from '@/lib/api/body';
 // app/api/creator/[username]/route.ts
 // CR AudioViz AI - Javari Scrapbook Creator Profile API
 // Created: 2026-03-14
@@ -80,8 +81,9 @@ export async function PATCH(
     if (!_auth.ok) return _auth.res;
     const user = { id: _auth.userId, email: _auth.email };if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const body = await request.json()
-    const { display_name, bio, website } = body
+    const parsed = await readBody<Record<string, unknown>>(request);
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.body as any;const { display_name, bio, website } = body
 
     const { data: updated, error } = await supabase
       .from('profiles')
