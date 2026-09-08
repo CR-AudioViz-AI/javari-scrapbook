@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // app/api/pexels/curated/route.ts
 // Pexels Curated/Popular API for photos and videos
 // Timestamp: Tuesday, December 24, 2025 – 2:03 PM Eastern Time
@@ -10,6 +11,9 @@ export const runtime = "nodejs";
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 
 export async function GET(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const searchParams = request.nextUrl.searchParams;
   const page = searchParams.get('page') || '1';
   const perPage = searchParams.get('per_page') || '15';
