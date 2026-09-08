@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // app/api/ai/enhance/route.ts
 // AI Photo Enhancement & Generation Service
 
@@ -16,6 +17,9 @@ const FREE_APIS = {
 };
 
 export async function POST(request: Request) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   try {
     const body = await request.json();
     const { action, imageUrl, prompt, options } = body;
