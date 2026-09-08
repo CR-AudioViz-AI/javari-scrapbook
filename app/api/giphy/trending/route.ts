@@ -1,3 +1,4 @@
+import { rateLimit } from '@/lib/api/rate-limit';
 // app/api/giphy/trending/route.ts
 // GIPHY Trending API for GIFs and Stickers
 // Timestamp: Tuesday, December 24, 2025 – 2:33 PM Eastern Time
@@ -10,6 +11,9 @@ export const runtime = "nodejs";
 const GIPHY_API_KEY = process.env.GIPHY_API_KEY;
 
 export async function GET(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const searchParams = request.nextUrl.searchParams;
   const offset = searchParams.get('offset') || '0';
   const limit = searchParams.get('limit') || '25';
