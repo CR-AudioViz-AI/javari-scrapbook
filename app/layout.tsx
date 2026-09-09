@@ -14,7 +14,7 @@
 // This layout was rewritten in May 2026 as a brand shell and the import
 // went with the rewrite.
 import './globals.css'
-import { BrandedHeader, BrandedFooter } from '@craudioviz/platform-sdk'
+import { ThemeProvider, BrandedHeader, BrandedFooter } from '@craudioviz/platform-sdk'
 import type { Metadata } from 'next'
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
@@ -26,6 +26,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body style={{ margin: 0, padding: 0, fontFamily: 'system-ui, sans-serif' }}>
+        {/* 2026-09-07: ThemeProvider is REQUIRED, not optional.
+            BrandedHeader renders ThemeToggle, which calls useTheme, which
+            THROWS 'useTheme must be used within ThemeProvider' when there is no
+            provider above it. Mounting the header without this returns 500 on
+            every render - a green build and a dead page.
+            Nothing in the SDK says so. Every app wiring the chrome needs this. */}
+        <ThemeProvider>
         <BrandedHeader
           appName="Javari Scrapbook"
           quickLinks={[
@@ -70,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </p>
         </footer>
         <BrandedFooter appName="Javari Scrapbook" />
+        </ThemeProvider>
       </body>
     </html>
   )
