@@ -1,5 +1,19 @@
 // app/layout.tsx — server-rendered brand shell
 // CR AudioViz AI · EIN: 39-3646201 · May 2026
+// 2026-09-07: globals.css was not imported, so NOTHING was styled.
+//
+// Next.js emits a stylesheet link only for CSS reachable from the module
+// graph. With no import anywhere, the built page carried ZERO stylesheet
+// links and every visitor got raw unstyled HTML - left-aligned text,
+// default fonts, no layout at all.
+//
+// Tailwind was installed and configured the whole time. The build passed,
+// every route answered 200, and the site looked broken to anybody who
+// opened it. No check on this platform looks at what a page LOOKS like.
+//
+// This layout was rewritten in May 2026 as a brand shell and the import
+// went with the rewrite.
+import './globals.css'
 import type { Metadata } from 'next'
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
