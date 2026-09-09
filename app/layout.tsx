@@ -14,7 +14,6 @@
 // This layout was rewritten in May 2026 as a brand shell and the import
 // went with the rewrite.
 import './globals.css'
-import { BrandedHeader, BrandedFooter } from '@craudioviz/platform-sdk/components/brand'
 import type { Metadata } from 'next'
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
@@ -26,21 +25,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body style={{ margin: 0, padding: 0, fontFamily: 'system-ui, sans-serif' }}>
-        {/* 2026-09-07: the platform chrome, from the SDK.
-            NOT a local copy. This repo already carried eight duplicated files
-            under components/brand/ that NOTHING imported - dead copies of the
-            SDK sitting beside it while the app rendered no header at all.
-            Those are deleted; this is the shared one. */}
-        <BrandedHeader
-          appName="Javari Scrapbook"
-          quickLinks={[
-            { label: 'All Apps', href: 'https://craudiovizai.com/apps' },
-            { label: 'Games', href: 'https://craudiovizai.com/games' },
-            { label: 'Tools', href: 'https://craudiovizai.com/tools' },
-            { label: 'Pricing', href: 'https://craudiovizai.com/pricing' },
-            { label: 'Support', href: 'https://craudiovizai.com/support' },
-          ]}
-        />
 
         {/* 2026-09-10: WCAG 2.4.1. Without this a keyboard user traverses the
             entire navigation on every page before reaching anything. Visually
@@ -72,7 +56,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <a href="https://craudiovizai.com/auth/signup" style={{ color: '#ec4899', textDecoration: 'none', fontWeight: 600 }}>Sign Up Free</a>
           </p>
         </footer>
-        <BrandedFooter appName="Javari Scrapbook" />
       </body>
     </html>
   )
