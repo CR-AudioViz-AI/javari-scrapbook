@@ -307,7 +307,18 @@ export default function UnsplashBrowser({ onSelect, onAddToCanvas }: UnsplashBro
                 />
 
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* 2026-09-07: the credit is ALWAYS VISIBLE and the photographer's
+                    name is a link to their profile.
+
+                    It used to be opacity-0 until hover, which meant a photo could
+                    be looked at, chosen and used without the credit ever appearing -
+                    and on a touch screen there is no hover at all, so it was
+                    effectively invisible to anybody on a phone.
+
+                    Unsplash's guidelines require the photographer AND Unsplash to be
+                    credited and LINKED. Beyond the guideline, a name shown only to
+                    people who happen to hover is not really a credit. */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent">
                   {/* Attribution */}
                   <div className="absolute bottom-0 left-0 right-0 p-2">
                     <div className="flex items-center gap-2">
@@ -317,7 +328,25 @@ export default function UnsplashBrowser({ onSelect, onAddToCanvas }: UnsplashBro
                         className="w-6 h-6 rounded-full"
                       />
                       <span className="text-white text-xs truncate flex-1">
-                        {photo.user.name}
+                        <a
+                          href={`https://unsplash.com/@${photo.user.username}?utm_source=javari_scrapbook&utm_medium=referral`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="underline hover:text-white/80"
+                        >
+                          {photo.user.name}
+                        </a>
+                        {' on '}
+                        <a
+                          href="https://unsplash.com/?utm_source=javari_scrapbook&utm_medium=referral"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="underline hover:text-white/80"
+                        >
+                          Unsplash
+                        </a>
                       </span>
                       <div className="flex items-center gap-1 text-white text-xs">
                         <Heart className="w-3 h-3" />
