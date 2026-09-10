@@ -32,38 +32,11 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                javari Scrapbook
-              </span>
-            </div>
-            
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-gray-600 dark:text-gray-300 hover:text-pink-500 transition">Features</a>
-              <a href="#templates" className="text-gray-600 dark:text-gray-300 hover:text-pink-500 transition">Templates</a>
-              <a href="#pricing" className="text-gray-600 dark:text-gray-300 hover:text-pink-500 transition">Pricing</a>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <a href="https://craudiovizai.com/auth/login" className="text-gray-600 dark:text-gray-300 hover:text-pink-500 transition">
-                Sign In
-              </a>
-              <Link
-                href="/editor/new"
-                className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-medium hover:opacity-90 transition"
-              >
-                Start Free
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* 2026-09-07: this app's own fixed nav was removed.
+          It was `fixed top-0 z-50`, so it sat OVER the platform header from
+          the SDK - two headers, and the app's pink one won. A visitor saw an
+          unrelated site with no way back to craudiovizai.com.
+          The shared header in app/layout.tsx is the only header. */}
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 overflow-hidden">
