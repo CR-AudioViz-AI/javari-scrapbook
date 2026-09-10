@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prebuild": "node scripts/audit-route-auth.mjs"
+    "prebuild": "node scripts/check-sdk-install.mjs && node scripts/audit-route-auth.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
