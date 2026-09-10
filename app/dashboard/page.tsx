@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getAccessToken } from '@/lib/auth/access-token';
-import { isEmbedded, postToParent } from '@/lib/embed/bridge';
+import { isEmbedded, postToParent } from '@craudioviz/platform-sdk';
 import {
   Plus, Search, Grid, List, Filter, SortAsc, SortDesc,
   Heart, Eye, Users, Calendar, MoreVertical, Trash2, Copy,

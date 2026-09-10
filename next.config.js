@@ -1,15 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
       async headers() {
-        // Production: the platform's own origins only. Preview builds also allow
-        // this team's *.vercel.app previews so the embed can be verified before it
-        // ships; that wider list never reaches a production deployment.
-        const FRAME_ANCESTORS = [
-          "'self'",
-          'https://craudiovizai.com', 'https://www.craudiovizai.com',
-          'https://javariscrapbook.com', 'https://www.javariscrapbook.com',
-          ...(process.env.VERCEL_ENV === 'preview' ? ['https://*.vercel.app'] : []),
-        ].join(' ');
+        // The platform SDK owns the embed policy (frame-ancestors for craudiovizai.com
+        // and this app's branded domain; preview builds add *.vercel.app).
+        const FRAME_ANCESTORS = require('@craudioviz/platform-sdk/embed-headers.js').frameAncestors({ brandedDomain: 'javariscrapbook.com' });
         // 2026-09-02: added after an ecosystem sweep found 58 of 60 live sites with
         // no CSP and weak or absent HSTS. This project had no headers() at all.
         //
@@ -41,10 +35,7 @@ const nextConfig = {
   // TypeScript and Next does not run node_modules through SWC by default, so
   // any import carrying a `type` re-export fails the build without this.
   transpilePackages: ["@craudioviz/platform-sdk"],
-  // 2026-09-10: lib/embed/bridge.ts accepts core PREVIEW parents only on preview
-  // builds. Pinned here at build time rather than relying on Vercel's optional
-  // automatic exposure of system variables.
-  env: { NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV ?? 'development' },
+
   reactStrictMode: true,
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },

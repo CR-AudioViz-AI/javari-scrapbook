@@ -14,7 +14,7 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
-import { isEmbedded, parentAccessToken } from '@/lib/embed/bridge';
+import { isEmbedded, parentAccessToken } from '@craudioviz/platform-sdk';
 
 export async function getAccessToken(): Promise<string | null> {
   if (isEmbedded()) return parentAccessToken();

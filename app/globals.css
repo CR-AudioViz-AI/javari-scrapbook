@@ -838,5 +838,5 @@ img {
    header and footer around this app, so the app's own bar, nav and footer are
    hidden, and the landing hero drops the space it reserved for the fixed nav.
    <html data-embedded> is set by an inline script in app/layout.tsx before paint. */
-html[data-embedded] [data-app-chrome] { display: none !important; }
+/* [data-app-chrome] hiding is injected by EMBED_PREPAINT_SCRIPT (platform SDK). */
 html[data-embedded] [data-embed-compact] { padding-top: 2rem !important; }

@@ -15,7 +15,7 @@
 // went with the rewrite.
 import './globals.css'
 import type { Metadata } from 'next'
-import EmbedBridge from '@/components/EmbedBridge'
+import { EmbedBridge, EMBED_PREPAINT_SCRIPT } from '@craudioviz/platform-sdk'
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'Javari Scrapbook',
@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* 2026-09-10: mark the document as embedded BEFORE first paint, so the
             app's own bar and footer never flash inside craudiovizai.com, which
             already shows the site's header and footer around it. */}
-        <script dangerouslySetInnerHTML={{ __html: "try{if(window.self!==window.top)document.documentElement.setAttribute('data-embedded','')}catch(e){document.documentElement.setAttribute('data-embedded','')}" }} />
+        <script dangerouslySetInnerHTML={{ __html: EMBED_PREPAINT_SCRIPT }} />
       </head>
       <body style={{ margin: 0, padding: 0, fontFamily: 'system-ui, sans-serif' }}>
         {/* 2026-09-10: WCAG 2.4.1. Without this a keyboard user traverses the
