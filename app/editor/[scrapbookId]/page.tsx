@@ -14,6 +14,8 @@ import { PropertiesPanel } from '@/components/editor/PropertiesPanel';
 import { EnhancedPagesPanel } from '@/components/editor/EnhancedPagesPanel';
 import { OnboardingOverlay, KeyboardShortcutsModal, EmptyCanvasPrompt } from '@/components/Onboarding';
 import type { Scrapbook } from '@/lib/types';
+import { authedFetch } from '@/lib/api/authed-fetch';
+import { toEditorScrapbook, type ApiScrapbook } from '@/lib/scrapbook-mapping';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Loader2,
@@ -73,6 +75,10 @@ export default function EditorPage() {
   const [showRightPanel, setShowRightPanel] = useState(true);
   const [showPagesPanel, setShowPagesPanel] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [saveError, setSaveError] = useState<string | null>(null);
+  // The document as last persisted. Autosave skips an unchanged document, so an
+  // idle editor does not rewrite every row every 30 seconds.
+  const lastSavedJson = useRef<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
 
@@ -113,25 +119,37 @@ export default function EditorPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Load scrapbook on mount
+  // Load scrapbook on mount.
+  // 2026-09-10: this used to IGNORE the id - every scrapbook opened as a blank
+  // "My Scrapbook", so reopening your work showed an empty page.
   useEffect(() => {
+    let cancelled = false;
     const loadScrapbook = async () => {
       setLoading(true);
       try {
         if (scrapbookId === 'new') {
           setScrapbook(createNewScrapbook());
-        } else {
-          const demoScrapbook = createNewScrapbook('My Scrapbook');
-          demoScrapbook.id = scrapbookId;
-          setScrapbook(demoScrapbook);
+          lastSavedJson.current = null;
+          return;
         }
-      } catch (error) {
-        console.error('Failed to load scrapbook:', error);
+        const res = await authedFetch(`/api/scrapbooks/${scrapbookId}`);
+        if (!res.ok) {
+          if (!cancelled) setScrapbook(null);
+          return;
+        }
+        const loaded = toEditorScrapbook((await res.json()) as ApiScrapbook);
+        if (!cancelled) {
+          setScrapbook(loaded);
+          lastSavedJson.current = JSON.stringify(loaded);
+        }
+      } catch {
+        if (!cancelled) setScrapbook(null);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
     loadScrapbook();
+    return () => { cancelled = true; };
   }, [scrapbookId, setScrapbook, setLoading]);
 
   // Auto-save every 30 seconds
@@ -144,17 +162,40 @@ export default function EditorPage() {
     return () => clearInterval(interval);
   }, [scrapbook, isSaving]);
 
+  // 2026-09-10: this used to wait 800ms and report "Saved" without sending
+  // anything anywhere. Every user's work was lost while the editor said it was
+  // safe. It now persists the whole document through scrapbook_save().
   const handleSave = async () => {
     if (!scrapbook || isSaving) return;
+    const json = JSON.stringify(scrapbook);
+    if (json === lastSavedJson.current) return;
     setSaveStatus('saving');
+    setSaveError(null);
     setSaving(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const res = await authedFetch(`/api/scrapbooks/${scrapbook.id}/autosave`, {
+        method: 'POST',
+        body: JSON.stringify({ scrapbook }),
+      });
+      if (!res.ok) {
+        const message =
+          res.status === 401 ? 'Sign in to save your scrapbook' :
+          res.status === 403 ? 'You do not have permission to edit this scrapbook' :
+          res.status === 413 ? 'This scrapbook is too large to save in one go' :
+          'Save failed - your changes are still here, try again';
+        throw new Error(message);
+      }
+      lastSavedJson.current = json;
       setSaveStatus('saved');
       setLastSaved(new Date());
+      // A new scrapbook now has a permanent address. replaceState, not the
+      // router: the id is unchanged, so there is nothing to reload.
+      if (scrapbookId === 'new' && typeof window !== 'undefined') {
+        window.history.replaceState(null, '', `/editor/${scrapbook.id}`);
+      }
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
-      console.error('Failed to save:', error);
+      setSaveError(error instanceof Error ? error.message : 'Save failed');
       setSaveStatus('error');
     } finally {
       setSaving(false);
@@ -289,6 +330,11 @@ export default function EditorPage() {
             {saveStatus === 'saved' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2 text-sm text-green-600">
                 <CheckCircle className="w-4 h-4" /> Saved
+              </motion.div>
+            )}
+            {saveStatus === 'error' && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="alert" className="flex items-center gap-2 text-sm text-red-600">
+                <AlertCircle className="w-4 h-4" /> {saveError ?? 'Save failed'}
               </motion.div>
             )}
           </AnimatePresence>

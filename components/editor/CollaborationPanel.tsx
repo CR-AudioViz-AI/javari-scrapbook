@@ -9,6 +9,7 @@ import {
   Users, X, Mail, UserPlus, Crown, Edit3, Eye, Trash2,
   Check, Copy, Share2, Link2, MessageSquare, Bell, Loader2
 } from 'lucide-react';
+import { authedFetch } from '@/lib/api/authed-fetch';
 
 interface Collaborator {
   id: string;
@@ -42,7 +43,7 @@ export function CollaborationPanel({ scrapbookId, isOwner, onClose }: Collaborat
 
   const fetchCollaborators = async () => {
     try {
-      const response = await fetch(`/api/scrapbooks/${scrapbookId}/collaborate`);
+      const response = await authedFetch(`/api/scrapbooks/${scrapbookId}/collaborate`);
       const data = await response.json();
       setCollaborators(data.collaborators || []);
     } catch (error) {
@@ -58,7 +59,7 @@ export function CollaborationPanel({ scrapbookId, isOwner, onClose }: Collaborat
 
     setInviting(true);
     try {
-      const response = await fetch(`/api/scrapbooks/${scrapbookId}/collaborate`, {
+      const response = await authedFetch(`/api/scrapbooks/${scrapbookId}/collaborate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: inviteEmail, role: inviteRole })
@@ -77,7 +78,7 @@ export function CollaborationPanel({ scrapbookId, isOwner, onClose }: Collaborat
 
   const removeCollaborator = async (collaboratorId: string) => {
     try {
-      await fetch(`/api/scrapbooks/${scrapbookId}/collaborate?collaboratorId=${collaboratorId}`, {
+      await authedFetch(`/api/scrapbooks/${scrapbookId}/collaborate?collaboratorId=${collaboratorId}`, {
         method: 'DELETE'
       });
       fetchCollaborators();

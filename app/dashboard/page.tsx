@@ -12,6 +12,7 @@ import {
   Share2, Download, Edit3, Star, Folder, Clock, TrendingUp,
   Sparkles, BookOpen, Image, Loader2, ChevronDown
 } from 'lucide-react';
+import { authedFetch } from '@/lib/api/authed-fetch';
 
 interface Scrapbook {
   id: string;
@@ -55,7 +56,7 @@ export default function DashboardPage() {
         sort: sortBy,
         order: sortOrder
       });
-      const response = await fetch(`/api/scrapbooks?${params}`);
+      const response = await authedFetch(`/api/scrapbooks?${params}`);
       const data = await response.json();
       setScrapbooks(data.scrapbooks || []);
     } catch (error) {
@@ -84,7 +85,7 @@ export default function DashboardPage() {
   const deleteScrapbook = async (id: string) => {
     if (!confirm('Are you sure you want to delete this scrapbook?')) return;
     try {
-      await fetch(`/api/scrapbooks/${id}`, { method: 'DELETE' });
+      await authedFetch(`/api/scrapbooks/${id}`, { method: 'DELETE' });
       fetchScrapbooks();
     } catch (error) {
       console.error('Failed to delete:', error);
@@ -93,7 +94,7 @@ export default function DashboardPage() {
 
   const duplicateScrapbook = async (id: string) => {
     try {
-      const response = await fetch(`/api/scrapbooks/${id}/duplicate`, { method: 'POST' });
+      const response = await authedFetch(`/api/scrapbooks/${id}/duplicate`, { method: 'POST' });
       if (response.ok) {
         fetchScrapbooks();
       }

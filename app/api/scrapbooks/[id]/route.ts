@@ -3,7 +3,10 @@ import { readBody } from '@/lib/api/body';
 // Single scrapbook CRUD operations
 
 
-import { requireUser } from "@/lib/api/require-user";
+import { requireUser, optionalUser } from "@/lib/api/require-user";
+import { serviceClient } from "@/lib/api/service-client";
+import { scrapbookAccess, isUuid } from "@/lib/api/scrapbook-access";
+import { toDetail, type PageRow, type ScrapbookRow } from "@/lib/api/scrapbook-dto";
 import { NextResponse } from 'next/server';
 
 // Service-role client. Identity comes from requireUser above; this only
@@ -32,84 +35,61 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  // 2026-09-10: identity is OPTIONAL here. This called requireUser() before it
+  // looked at is_public, so every shared /view link answered 401 to anonymous
+  // visitors. Not-found and not-allowed answer the same 404 so ids cannot be
+  // probed.
+  if (!isUuid(params.id)) {
+    return NextResponse.json({ error: 'Scrapbook not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+  }
   try {
-    const supabase = createSupabaseSSRClient();
-        // 2026-08-19: read the session from COOKIES via @supabase/auth-helpers or
-    // @supabase/ssr. Sessions live in localStorage on this platform and nothing
-    // writes a Supabase auth cookie, so this found no user and answered 401 to
-    // EVERYONE - signed in or not. It never errored; it took the unauthenticated
-    // path and looked like it worked. Same bug that broke 32 core routes.
-    const _auth = await requireUser(request);
-    if (!_auth.ok) return _auth.res;
-    const user = { id: _auth.userId, email: _auth.email };
+    const db = serviceClient();
+    const viewer = await optionalUser(request);
+    const access = await scrapbookAccess(db, params.id, viewer?.userId ?? null);
+    if (!access.exists || !access.canView) {
+      return NextResponse.json({ error: 'Scrapbook not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    }
 
-    // Fetch scrapbook with pages and elements
-    const { data: scrapbook, error } = await supabase
+    const { data, error } = await db
       .from('scrapbooks')
-      .select(`
-        *,
-        pages:scrapbook_pages(
-          *,
-          elements:scrapbook_elements(*)
-        )
-      `)
+      .select('*, pages:scrapbook_pages(*, elements:scrapbook_elements(*))')
       .eq('id', params.id)
-      .order('page_order', { foreignTable: 'scrapbook_pages', ascending: true })
-      .order('z_index', { foreignTable: 'scrapbook_pages.scrapbook_elements', ascending: true })
       .single();
-
     if (error) throw error;
-    if (!scrapbook) {
-      return NextResponse.json({ error: 'Scrapbook not found' }, { status: 404 });
-    }
+    const row = data as ScrapbookRow & { pages: PageRow[] };
 
-    // Type assertion for scrapbook data
-    const scrapbookData = scrapbook as any;
-
-    // Check access
-    const isOwner = user?.id === scrapbookData.user_id;
-    const isPublic = scrapbookData.is_public;
-
-    // Fetch collaborators separately
-    const { data: collaborators } = await supabase
+    const { data: collaborators, error: cErr } = await db
       .from('scrapbook_collaborators')
-      .select('*')
+      .select('id, user_id, role, created_at')
       .eq('scrapbook_id', params.id);
+    if (cErr) throw cErr;
 
-    const isCollaborator = collaborators?.some((c: any) => c.user_id === user?.id);
-    const canEdit = isOwner || collaborators?.some((c: any) => c.user_id === user?.id && c.role === 'editor');
-
-    if (!isOwner && !isCollaborator && !isPublic) {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    if (!access.isOwner) {
+      const { error: vErr } = await db.rpc('increment_view_count', { scrapbook_uuid: params.id });
+      if (vErr) console.error(JSON.stringify({ level: 'ERROR', event: 'VIEW_COUNT_FAILED', id: params.id, message: vErr.message }));
     }
 
-    // Increment view count for non-owners
-    if (!isOwner && user) {
-      await supabase.rpc('increment_view_count', { scrapbook_uuid: params.id });
-    }
-
-    // Check if user has liked
     let hasLiked = false;
-    if (user) {
-      const { data: like } = await supabase
+    if (viewer) {
+      const { data: like } = await db
         .from('scrapbook_likes')
         .select('id')
         .eq('scrapbook_id', params.id)
-        .eq('user_id', user.id)
-        .single();
+        .eq('user_id', viewer.userId)
+        .maybeSingle();
       hasLiked = !!like;
     }
 
     return NextResponse.json({
-      ...scrapbookData,
-      collaborators: collaborators || [],
-      isOwner,
-      isCollaborator,
+      ...toDetail(row, row.pages ?? []),
+      collaborators: collaborators ?? [],
+      isOwner: access.isOwner,
+      isCollaborator: access.isCollaborator,
+      canEdit: access.canEdit,
       hasLiked,
-      canEdit
-    });
-  } catch (error: any) {
-    console.error('Scrapbook fetch error:', error);
+    }, { headers: { 'Cache-Control': 'no-store' } });
+  } catch (error: unknown) {
+    console.error(JSON.stringify({ level: 'ERROR', event: 'SCRAPBOOK_FETCH_FAILED', id: params.id, message: error instanceof Error ? error.message : String(error) }));
     return NextResponse.json({ error: 'The request could not be completed.', code: 'INTERNAL_ERROR' }, { status: 500 });
   }
 }

@@ -10,6 +10,7 @@ import {
   BookOpen, Maximize, Minimize, X, MessageSquare, User,
   Calendar, Loader2, ExternalLink
 } from 'lucide-react';
+import { authedFetch } from '@/lib/api/authed-fetch';
 
 interface ViewPageProps {
   params: { id: string };
@@ -29,7 +30,7 @@ export default function ViewPage({ params }: ViewPageProps) {
 
   const fetchScrapbook = async () => {
     try {
-      const response = await fetch(`/api/scrapbooks/${params.id}`);
+      const response = await authedFetch(`/api/scrapbooks/${params.id}`);
       const data = await response.json();
       setScrapbook(data);
       setLiked(data.hasLiked);
@@ -42,7 +43,7 @@ export default function ViewPage({ params }: ViewPageProps) {
 
   const toggleLike = async () => {
     try {
-      const response = await fetch(`/api/scrapbooks/${params.id}/like`, {
+      const response = await authedFetch(`/api/scrapbooks/${params.id}/like`, {
         method: 'POST'
       });
       const data = await response.json();

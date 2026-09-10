@@ -68,3 +68,18 @@ export async function requireUser(req: Request): Promise<AuthResult> {
     return { ok: false, res: unauthorized("verification failed") };
   }
 }
+
+/**
+ * The verified caller if a valid token was sent, otherwise null.
+ *
+ * 2026-09-10: for routes whose PUBLIC content anyone may read (a published
+ * scrapbook). GET /api/scrapbooks/[id] called requireUser() BEFORE checking
+ * is_public, so every shared /view link answered 401 to anonymous visitors.
+ * A present-but-invalid token is treated as anonymous, never as a user.
+ */
+export async function optionalUser(req: Request): Promise<{ userId: string; email: string | null } | null> {
+  const header = req.headers.get("authorization") ?? req.headers.get("Authorization");
+  if (!header?.startsWith("Bearer ")) return null;
+  const result = await requireUser(req);
+  return result.ok ? { userId: result.userId, email: result.email } : null;
+}

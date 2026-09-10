@@ -10,6 +10,7 @@ import {
   Check, ChevronRight, ExternalLink, QrCode, Copy, Mail,
   Facebook, Twitter
 } from 'lucide-react';
+import { authedFetch } from '@/lib/api/authed-fetch';
 
 interface ExportModalProps {
   scrapbookId: string;
@@ -89,7 +90,7 @@ export function ExportModal({ scrapbookId, scrapbookTitle, pageCount, onClose }:
         setExportProgress(prev => Math.min(prev + 10, 90));
       }, 200);
 
-      const response = await fetch('/api/export', {
+      const response = await authedFetch('/api/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
