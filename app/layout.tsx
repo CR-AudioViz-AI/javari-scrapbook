@@ -1,55 +1,43 @@
-// app/layout.tsx — server-rendered brand shell
-// CR AudioViz AI · EIN: 39-3646201 · May 2026
-// 2026-09-07: globals.css was not imported, so NOTHING was styled.
+// app/layout.tsx — Javari Scrapbook
+// CR AudioViz AI · EIN: 39-3646201
 //
-// Next.js emits a stylesheet link only for CSS reachable from the module
-// graph. With no import anywhere, the built page carried ZERO stylesheet
-// links and every visitor got raw unstyled HTML - left-aligned text,
-// default fonts, no layout at all.
+// 2026-09-07: ONE header and ONE footer, both the platform's.
 //
-// Tailwind was installed and configured the whole time. The build passed,
-// every route answered 200, and the site looked broken to anybody who
-// opened it. No check on this platform looks at what a page LOOKS like.
+// This file previously stacked three bars: the SDK's BrandedHeader (a thin strip
+// with a logo and a Log In link - NOT the site header), a hand-rolled dark strip
+// with the app name and a "Free to Start" button, and a hand-rolled copyright
+// footer. app/page.tsx added a fourth, a fixed pink nav that covered them all.
+// Four different chromes on one page.
 //
-// This layout was rewritten in May 2026 as a brand shell and the import
-// went with the rewrite.
+// PlatformHeader and PlatformFooter are the real ones, ported into the SDK from
+// the core so this app renders exactly what craudiovizai.com renders. Their
+// hrefs are absolute, so they lead back to the platform from this domain.
+//
+// globals.css must stay imported. Next emits a stylesheet link only for CSS
+// reachable from the module graph; without it this site served raw HTML for
+// months while every build passed.
 import './globals.css'
-import { ThemeProvider, BrandedHeader, BrandedFooter } from '@craudioviz/platform-sdk'
+import { PlatformHeader, PlatformFooter } from '@craudioviz/platform-sdk'
 import type { Metadata } from 'next'
+
 export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Javari Scrapbook',
   description: 'AI-powered digital scrapbooking — organize memories, create stories.',
-  openGraph: { title: 'Javari Scrapbook', description: 'AI-powered digital scrapbooking — organize memories, create stories.', type: 'website' },
+  openGraph: {
+    title: 'Javari Scrapbook',
+    description: 'AI-powered digital scrapbooking — organize memories, create stories.',
+    type: 'website',
+  },
 }
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, padding: 0, fontFamily: 'system-ui, sans-serif' }}>
-        {/* 2026-09-07: ThemeProvider is REQUIRED, not optional.
-            BrandedHeader renders ThemeToggle, which calls useTheme, which
-            THROWS 'useTheme must be used within ThemeProvider' when there is no
-            provider above it. Mounting the header without this returns 500 on
-            every render - a green build and a dead page.
-            Nothing in the SDK says so. Every app wiring the chrome needs this. */}
-        <ThemeProvider>
-        <BrandedHeader
-          appName="Javari Scrapbook"
-          quickLinks={[
-            { label: 'All Apps', href: 'https://craudiovizai.com/apps' },
-            { label: 'Games', href: 'https://craudiovizai.com/games' },
-            { label: 'Tools', href: 'https://craudiovizai.com/tools' },
-            { label: 'Market', href: 'https://craudiovizai.com/market' },
-            { label: 'Pricing', href: 'https://craudiovizai.com/pricing' },
-            { label: 'Help', href: 'https://craudiovizai.com/help' },
-          ]}
-        />
-
-
-        {/* 2026-09-10: WCAG 2.4.1. Without this a keyboard user traverses the
-            entire navigation on every page before reaching anything. Visually
-            hidden until focused, which is the point - it is for people who are
-            not using a mouse, and it appears the moment they tab. */}
+      <body style={{ margin: 0, padding: 0 }}>
+        {/* WCAG 2.4.1. Hidden until focused - it exists for people not using a
+            mouse, and appears the moment they tab. */}
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-black focus:outline focus:outline-2"
@@ -57,27 +45,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to main content
         </a>
 
-        <div style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(8px)', padding: '6px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 200 }}>
-          <a href="https://craudiovizai.com" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: '#fff', fontSize: 13, fontWeight: 600 }}>
-            <span>📔</span>
-            <span style={{ color: '#ec4899' }}>Javari Scrapbook</span>
-            <span style={{ color: '#374151', fontSize: 11, marginLeft: 4 }}>· CR AudioViz AI · EIN 39-3646201</span>
-          </a>
-          <a href="https://craudiovizai.com/auth/signup" style={{ background: '#ec4899', color: '#000', borderRadius: 6, padding: '4px 14px', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
-            Free to Start →
-          </a>
-        </div>
-        {children}
-        <footer style={{ background: '#050608', borderTop: '1px solid rgba(255,255,255,0.05)', padding: '16px 24px', textAlign: 'center' }}>
-          <p style={{ color: '#1f2937', fontSize: 11, margin: 0, fontFamily: 'system-ui' }}>
-            © 2026 CR AudioViz AI, LLC — EIN: 39-3646201 · Fort Myers, Florida · Your Story. Our Design. ·{' '}
-            <a href="https://craudiovizai.com" style={{ color: '#374151', textDecoration: 'none' }}>craudiovizai.com</a>
-            {' '}·{' '}
-            <a href="https://craudiovizai.com/auth/signup" style={{ color: '#ec4899', textDecoration: 'none', fontWeight: 600 }}>Sign Up Free</a>
-          </p>
-        </footer>
-        <BrandedFooter appName="Javari Scrapbook" />
-        </ThemeProvider>
+        <PlatformHeader />
+        <main id="main">{children}</main>
+        <PlatformFooter />
       </body>
     </html>
   )
