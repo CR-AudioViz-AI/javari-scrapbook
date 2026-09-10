@@ -12,6 +12,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient as canonicalBrowserClient } from '@/lib/supabase/client';
 import { secretKey, publishableKey, supabaseUrl } from "@craudioviz/platform-sdk";
 
 // Re-export admin utilities from central services
@@ -24,26 +25,15 @@ const SUPABASE_ANON_KEY = publishableKey();
 // Standard client for general use
 export const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Browser client for auth (SSR-safe singleton pattern)
-let browserClient: SupabaseClient | null = null;
 
 export function createSupabaseBrowserClient(): SupabaseClient {
+  // 2026-09-10: this built a SECOND browser client beside lib/supabase/client.ts.
+  // Both used the same localStorage key, so two instances raced every token
+  // refresh - the duplicate-module defect class. There is now one client.
   if (typeof window === 'undefined') {
-    // Server-side: return new client each time
     return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
-  
-  // Client-side: return singleton
-  if (!browserClient) {
-    browserClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true
-      }
-    });
-  }
-  return browserClient;
+  return canonicalBrowserClient();
 }
 
 // Server client for API routes

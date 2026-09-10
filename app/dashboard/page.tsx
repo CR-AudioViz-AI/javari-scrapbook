@@ -6,6 +6,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { getAccessToken } from '@/lib/auth/access-token';
 import {
   Plus, Search, Grid, List, Filter, SortAsc, SortDesc,
   Heart, Eye, Users, Calendar, MoreVertical, Trash2, Copy,
@@ -43,6 +45,19 @@ export default function DashboardPage() {
   const [search, setSearch] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedScrapbook, setSelectedScrapbook] = useState<string | null>(null);
+
+  const router = useRouter();
+
+  // 2026-09-10: the gate lives here, not in middleware. Sessions are in
+  // localStorage, which the edge cannot see - the old cookie middleware sent
+  // EVERY signed-in user back to /login.
+  useEffect(() => {
+    let cancelled = false;
+    getAccessToken().then((token) => {
+      if (!cancelled && !token) router.replace('/login?next=/dashboard');
+    });
+    return () => { cancelled = true; };
+  }, [router]);
 
   useEffect(() => {
     fetchScrapbooks();

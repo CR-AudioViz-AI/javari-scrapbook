@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (provider: OAuthProvider) => {
     if (!supabase) return;
-    const { error } = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo: `${window.location.origin}/api/auth/callback` } });
+    const { error } = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo: `${window.location.origin}/auth/callback` } });
     if (error) throw error;
   }, [supabase]);
 
@@ -89,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithMagicLink = useCallback(async (email: string) => {
     if (!supabase) return { error: { message: 'Not initialized' } as AuthError };
-    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}/api/auth/callback` } });
+    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}/auth/callback` } });
     return { error };
   }, [supabase]);
 

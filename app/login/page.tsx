@@ -29,7 +29,7 @@ export default function LoginPage() {
       toast(error.message, 'error')
     } else {
       toast('Welcome back!', 'success')
-      router.push('/dashboard')
+      router.push((() => { const n = new URLSearchParams(window.location.search).get('next'); return n && n.startsWith('/') && !n.startsWith('//') ? n : '/dashboard'; })())
       router.refresh()
     }
     setLoading(false)
