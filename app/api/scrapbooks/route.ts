@@ -31,9 +31,17 @@ function fail(status: number, error: string): NextResponse {
   return NextResponse.json({ error }, { status, headers: NO_STORE });
 }
 
-/** Escape a user string for use inside a PostgREST ilike pattern. */
+/**
+ * A user search string made safe for a PostgREST or() filter.
+ *
+ * Backslash-escaping does not work inside or(): PostgREST parses , ( ) " : and
+ * rejected the escaped value with a 500 (caught by the end-to-end test). The
+ * reserved characters, and the LIKE wildcards % _ *, are replaced with a space
+ * - a title search loses nothing meaningful, and nothing a caller types can
+ * become filter syntax.
+ */
 function ilikeTerm(raw: string): string {
-  return raw.slice(0, 100).replace(/[%_\\,()*"]/g, (c) => `\\${c}`);
+  return raw.slice(0, 100).replace(/[,()"':%_*\\.]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 export async function GET(request: Request): Promise<NextResponse> {
@@ -65,9 +73,9 @@ export async function GET(request: Request): Promise<NextResponse> {
     query = ids ? query.in('id', ids) : query.eq('user_id', auth.userId);
     if (filter === 'favorites') query = query.contains('tags', ['favorite']);
     if (filter === 'public') query = query.eq('is_public', true);
-    if (search) {
-      const t = ilikeTerm(search);
-      query = query.or(`title.ilike.*${t}*,description.ilike.*${t}*`);
+    const term = search ? ilikeTerm(search) : '';
+    if (term) {
+      query = query.or(`title.ilike.*${term}*,description.ilike.*${term}*`);
     }
     const { data, error, count } = await query.order(sort, { ascending }).range(offset, offset + limit - 1);
     if (error) throw error;

@@ -1,95 +1,78 @@
 // app/api/publish/route.ts
-// CR AudioViz AI - Javari Scrapbook Content Publishing API
-// Created: 2026-03-14
+// Purpose: publish or unpublish a scrapbook the caller owns.
+// Date: 2026-09-10 (full replacement; original 2026-03-14)
+//
+// What the previous version got wrong, found by the end-to-end test:
+//   - wrote published_at, which did not exist (added by craudiovizai migration
+//     2026-09-10-scrapbook-published-at) - every publish answered 500
+//   - logged to javari_activity_log with columns that table does not have
+//   - parsed the body with request.json() outside any guard, and read cookies()
+//     it never used
+//   - reported a PostgrestError as "Internal server error" with no log line
+//
+// Only the OWNER may publish: publishing changes who can see a person's memories,
+// and an editor-collaborator should not be able to make them public.
+//
+// CR AudioViz AI, LLC · EIN 39-3646201
+import { NextResponse } from 'next/server';
+import { requireUser } from '@/lib/api/require-user';
+import { serviceClient } from '@/lib/api/service-client';
+import { scrapbookAccess, isUuid } from '@/lib/api/scrapbook-access';
+import { readBody } from '@/lib/api/body';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
-import { requireUser } from "@/lib/api/require-user";
-import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+const NO_STORE = { 'Cache-Control': 'no-store' } as const;
 
-// Service-role client. Identity comes from requireUser above; this only
-// reads and writes data.
-import { createClient as _mkClient } from '@supabase/supabase-js';
-import { secretKey, supabaseUrl } from "@craudioviz/platform-sdk";
-function createSupabaseServiceClient() {
-  return _mkClient(
-    supabaseUrl(),
-    secretKey(),
-    { auth: { persistSession: false },
-      global: { fetch: (u: RequestInfo | URL, o?: RequestInit) => fetch(u, { ...o, cache: 'no-store' }) } },
-  );
-}
+export async function POST(request: Request): Promise<NextResponse> {
+  const auth = await requireUser(request);
+  if (!auth.ok) return auth.res;
 
+  const parsed = await readBody<Record<string, unknown>>(request);
+  if (!parsed.ok) return parsed.response as NextResponse;
+  const b = parsed.body;
 
-export const dynamic = 'force-dynamic'
-export const runtime = 'nodejs'
+  if (!isUuid(b.scrapbookId)) {
+    return NextResponse.json({ error: 'scrapbookId required' }, { status: 400, headers: NO_STORE });
+  }
+  if (typeof b.isPublic !== 'boolean') {
+    return NextResponse.json({ error: 'isPublic must be true or false' }, { status: 400, headers: NO_STORE });
+  }
+  const scrapbookId = b.scrapbookId;
 
-export async function POST(request: Request) {
   try {
-    const cookieStore = cookies()
-    const supabase = createSupabaseServiceClient()
-
-        // 2026-08-19: read the session from COOKIES via @supabase/auth-helpers or
-    // @supabase/ssr. Sessions live in localStorage on this platform and nothing
-    // writes a Supabase auth cookie, so this found no user and answered 401 to
-    // EVERYONE - signed in or not. It never errored; it took the unauthenticated
-    // path and looked like it worked. Same bug that broke 32 core routes.
-    const _auth = await requireUser(request);
-    if (!_auth.ok) return _auth.res;
-    const user = { id: _auth.userId, email: _auth.email };if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    const { scrapbookId, isPublic, title, description, tags } = await request.json()
-
-    if (!scrapbookId) return NextResponse.json({ error: 'scrapbookId required' }, { status: 400 })
-
-    // Verify ownership
-    const { data: existing, error: fetchErr } = await supabase
-      .from('scrapbooks')
-      .select('id, user_id')
-      .eq('id', scrapbookId)
-      .eq('user_id', user.id)
-      .single()
-
-    if (fetchErr || !existing) {
-      return NextResponse.json({ error: 'Scrapbook not found or access denied' }, { status: 404 })
+    const db = serviceClient();
+    const access = await scrapbookAccess(db, scrapbookId, auth.userId);
+    if (!access.exists || !access.isOwner) {
+      return NextResponse.json({ error: 'Scrapbook not found or access denied' }, { status: 404, headers: NO_STORE });
     }
 
-    // Publish / unpublish
-    const updates: Record<string, unknown> = {
-      is_public: isPublic,
-      updated_at: new Date().toISOString(),
+    const now = new Date().toISOString();
+    const updates: Record<string, unknown> = { is_public: b.isPublic, updated_at: now };
+    if (b.isPublic) updates.published_at = now;
+    if (typeof b.title === 'string' && b.title.trim()) updates.title = b.title.trim().slice(0, 200);
+    if (typeof b.description === 'string') updates.description = b.description.slice(0, 5000);
+    if (Array.isArray(b.tags)) {
+      updates.tags = b.tags.filter((t): t is string => typeof t === 'string').map((t) => t.slice(0, 50)).slice(0, 50);
     }
-    if (title !== undefined) updates.title = title
-    if (description !== undefined) updates.description = description
-    if (tags !== undefined) updates.tags = tags
-    if (isPublic) updates.published_at = new Date().toISOString()
 
-    const { data: updated, error: updateErr } = await supabase
+    const { data: updated, error } = await db
       .from('scrapbooks')
       .update(updates)
       .eq('id', scrapbookId)
-      .eq('user_id', user.id)
-      .select()
-      .single()
-
-    if (updateErr) throw updateErr
-
-    // Telemetry
-    await supabase.from('javari_activity_log').insert({
-      user_id: user.id,
-      action: isPublic ? 'scrapbook_published' : 'scrapbook_unpublished',
-      resource_type: 'scrapbook',
-      resource_id: scrapbookId,
-      metadata: { title: updated.title },
-    }).then(() => {}).catch(() => {})
+      .eq('user_id', auth.userId)
+      .select('id, title, is_public, published_at, updated_at')
+      .single();
+    if (error) throw new Error(error.message);
 
     return NextResponse.json({
       success: true,
       scrapbook: updated,
-      message: isPublic ? 'Scrapbook published successfully' : 'Scrapbook unpublished',
-    })
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Internal server error'
-    return NextResponse.json({ error: msg }, { status: 500 })
+      message: b.isPublic ? 'Scrapbook published successfully' : 'Scrapbook unpublished',
+    }, { headers: NO_STORE });
+  } catch (e) {
+    console.error(JSON.stringify({ level: 'ERROR', event: 'SCRAPBOOK_PUBLISH_FAILED', id: scrapbookId, message: e instanceof Error ? e.message : String(e) }));
+    return NextResponse.json({ error: 'The request could not be completed.' }, { status: 500, headers: NO_STORE });
   }
 }
