@@ -23,7 +23,14 @@ const SUPABASE_URL = supabaseUrl();
 const SUPABASE_ANON_KEY = publishableKey();
 
 // Standard client for general use
-export const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// 2026-09-10: this was a full session client built at MODULE LOAD, so importing
+// this file anywhere in the browser created a second GoTrueClient on the shared
+// storage key ("Multiple GoTrueClient instances detected"). It is a data client
+// only: no session, no refresh, its own storage key. Sessions belong to
+// lib/supabase/client.ts alone.
+export const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'sb-scrapbook-data-client' },
+});
 
 
 export function createSupabaseBrowserClient(): SupabaseClient {

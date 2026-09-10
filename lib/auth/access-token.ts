@@ -9,11 +9,11 @@
 // CR AudioViz AI, LLC · EIN 39-3646201
 'use client';
 
-import { createSupabaseBrowserClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 export async function getAccessToken(): Promise<string | null> {
   try {
-    const { data } = await createSupabaseBrowserClient().auth.getSession();
+    const { data } = await createClient().auth.getSession();
     return data.session?.access_token ?? null;
   } catch {
     return null;
