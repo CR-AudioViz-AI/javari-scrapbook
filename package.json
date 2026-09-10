@@ -34,7 +34,7 @@
     "tailwind-merge": "^2.2.0",
     "uuid": "^9.0.1",
     "zustand": "^4.5.0",
-    "@craudioviz/platform-sdk": "git+https://github.com/CR-AudioViz-AI/platform-sdk.git#c3dc51c7e6e39be0c08fa1a25418e8372c8eb047"
+    "@craudioviz/platform-sdk": "git+https://github.com/CR-AudioViz-AI/platform-sdk.git#b60fd7bda89c4efbfca4947a7a42379c0e6ce326"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.7",
