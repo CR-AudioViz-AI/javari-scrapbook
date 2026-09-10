@@ -15,6 +15,7 @@
 // went with the rewrite.
 import './globals.css'
 import type { Metadata } from 'next'
+import EmbedBridge from '@/components/EmbedBridge'
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'Javari Scrapbook',
@@ -24,6 +25,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* 2026-09-10: mark the document as embedded BEFORE first paint, so the
+            app's own bar and footer never flash inside craudiovizai.com, which
+            already shows the site's header and footer around it. */}
+        <script dangerouslySetInnerHTML={{ __html: "try{if(window.self!==window.top)document.documentElement.setAttribute('data-embedded','')}catch(e){document.documentElement.setAttribute('data-embedded','')}" }} />
+      </head>
       <body style={{ margin: 0, padding: 0, fontFamily: 'system-ui, sans-serif' }}>
         {/* 2026-09-10: WCAG 2.4.1. Without this a keyboard user traverses the
             entire navigation on every page before reaching anything. Visually
@@ -36,7 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to main content
         </a>
 
-        <div style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(8px)', padding: '6px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 200 }}>
+        <EmbedBridge />
+        <div data-app-chrome style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(8px)', padding: '6px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 200 }}>
           <a href="https://craudiovizai.com" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: '#fff', fontSize: 13, fontWeight: 600 }}>
             <span>📔</span>
             <span style={{ color: '#ec4899' }}>Javari Scrapbook</span>
@@ -47,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </a>
         </div>
         {children}
-        <footer style={{ background: '#050608', borderTop: '1px solid rgba(255,255,255,0.05)', padding: '16px 24px', textAlign: 'center' }}>
+        <footer data-app-chrome style={{ background: '#050608', borderTop: '1px solid rgba(255,255,255,0.05)', padding: '16px 24px', textAlign: 'center' }}>
           <p style={{ color: '#1f2937', fontSize: 11, margin: 0, fontFamily: 'system-ui' }}>
             © 2026 CR AudioViz AI, LLC — EIN: 39-3646201 · Fort Myers, Florida · Your Story. Our Design. ·{' '}
             <a href="https://craudiovizai.com" style={{ color: '#374151', textDecoration: 'none' }}>craudiovizai.com</a>

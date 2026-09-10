@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getAccessToken } from '@/lib/auth/access-token';
+import { isEmbedded, postToParent } from '@/lib/embed/bridge';
 import {
   Plus, Search, Grid, List, Filter, SortAsc, SortDesc,
   Heart, Eye, Users, Calendar, MoreVertical, Trash2, Copy,
@@ -54,7 +55,11 @@ export default function DashboardPage() {
   useEffect(() => {
     let cancelled = false;
     getAccessToken().then((token) => {
-      if (!cancelled && !token) router.replace('/login?next=/dashboard');
+      if (cancelled || token) return;
+      // Inside craudiovizai.com the site's own login is the sign-in; opened
+      // directly, this app's /login is.
+      if (isEmbedded()) postToParent({ type: 'login', path: '/dashboard' });
+      else router.replace('/login?next=/dashboard');
     });
     return () => { cancelled = true; };
   }, [router]);

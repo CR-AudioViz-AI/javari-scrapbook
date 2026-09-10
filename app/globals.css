@@ -833,3 +833,10 @@ img {
     will-change: transform;
   }
 }
+
+/* 2026-09-10: embedded in craudiovizai.com/apps/scrapbook. The site draws its own
+   header and footer around this app, so the app's own bar, nav and footer are
+   hidden, and the landing hero drops the space it reserved for the fixed nav.
+   <html data-embedded> is set by an inline script in app/layout.tsx before paint. */
+html[data-embedded] [data-app-chrome] { display: none !important; }
+html[data-embedded] [data-embed-compact] { padding-top: 2rem !important; }
